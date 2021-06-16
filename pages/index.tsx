@@ -154,8 +154,7 @@ function App(props: any) {
   return (
     <Provider store={store}>
       <div className="App">
-
-
+        <Header/>
         <div className="body">
           <GoogleMapReact
             yesIWantToUseGoogleMapApiInternals
