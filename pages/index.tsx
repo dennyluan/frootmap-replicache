@@ -1,19 +1,23 @@
 import React, { useEffect, useState, MouseEvent, useRef } from "react";
-import GoogleMapReact from "google-map-react";
 import { useSelector, useDispatch, connect, Provider } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import useSupercluster from 'use-supercluster';
 
-import PinMarker from "./../components/PinMarker";
-import ClusterMarker from "../components/ClusterMarker";
 import PinFormModal from "../components/PinFormModal";
 import Header from "../components/Header";
 import PinModal from "../components/PinModal";
-import { ICoords, IPin, IPoint } from "../models/pins";
+import Map from "../components/Map";
+import { ICoords, IPin, IPoint, JSONValue } from "../models/types";
 import { useFormModal, usePinModal } from "../utils/useModal";
 
 import { loadPins, clearPins, selectPins } from '../features/pinSlice'
 import store from "./../utils/store";
+
+import { listen } from './../utils/rep';
+import { Replicache, WriteTransaction, MutatorDefs } from 'replicache';
+import { useSubscribe } from 'replicache-react-util';
+import * as Pusher from 'pusher-js';
+import { mutators } from './../features/mutators'
 
 
 function App(props: any) {
@@ -27,10 +31,11 @@ function App(props: any) {
   const [bounds, setBounds] = useState<any>(null)
   const [zoom, setZoom] = useState<number>(16);
 
-  let points : IPoint[] = []
-  if (props.pins && props.pins.length > 1) {
+  let allPoints : IPoint[] = []
 
-    points = props.pins.map( (pin : IPin) => ({
+  console.log("props.pins", props.pins)
+  if (props.pins && props.pins.length > 1) {
+    allPoints = props.pins.map( (pin : IPin) => ({
       "type": "Feature",
       "properties": {
         "cluster": false,
@@ -42,13 +47,15 @@ function App(props: any) {
         "coordinates": [
           pin.coords.lng,
           pin.coords.lat
+          // pin.coords[0],
+          // pin.coords[1]
         ]
       }
     }))
   }
 
   const { clusters, supercluster } = useSupercluster({
-    points,
+    points: allPoints,
     bounds,
     zoom,
     options: {
@@ -57,9 +64,13 @@ function App(props: any) {
     }
   })
 
-  // console.log("props.pins", props.pins)
+  console.log("clusters", clusters)
+
+  const [rep, setRep] = useState<Replicache>();
+
   useEffect(() => {
-    if (navigator.geolocation) {
+    // set the map location from browser
+    if (navigator.geolocation != undefined) {
       navigator.geolocation.getCurrentPosition(
         (position: {coords:{latitude: number, longitude: number}}) => {
           setViewCoords({
@@ -68,7 +79,7 @@ function App(props: any) {
           });
         },
         () => {
-          console.log("error");
+          console.log("map geo error");
         }
       );
     }
@@ -77,123 +88,65 @@ function App(props: any) {
     props.loadPins()
   }, []);
 
-  const handleClearPins = () : void => {
-    props.clearPins()
-    // toggle()
+  const repConfig = {
+    key: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_KEY,
+    cluster: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_CLUSTER
   }
 
-  const handleMapClick = ({
-    x,
-    y,
-    lat,
-    lng,
-    event,
-  }: {
-    x: number;
-    y: number;
-    lat: number;
-    lng: number;
-    event: MouseEvent<HTMLButtonElement>;
-  }): any => {
-    event.preventDefault();
-    if (!isShown)
-      toggle({lat: lat, lng: lng})
-  };
-
-  function renderMarkers() {
-    if (clusters == []) return
-
-    return clusters.map( (cluster, index) => {
-      const [lng, lat] = cluster.geometry.coordinates;
-      const {
-        cluster: isCluster,
-        point_count: pointCount,
-        text: text
-      } = cluster.properties;
-
-      if (isCluster) {
-
-        return <ClusterMarker
-          key={index}
-          id={cluster.properties.id}
-          lat={lat}
-          lng={lng}
-          text={pointCount}
-          width={`${10 + (pointCount / points.length ) * 20}px`}
-          length={`${10 + (pointCount / points.length ) * 20}px`}
-          onClick={() => {
-            const expansionZoom = Math.min(supercluster.getClusterExpansionZoom(cluster.id), 20);
-            mapRef.current.setZoom(expansionZoom)
-            mapRef.current.panTo({lat: lat, lng: lng})
-          }}
-        />
-
-      } else {
-
-        return <PinMarker
-          key={index}
-          id={cluster.properties.id}
-          lat={lat}
-          lng={lng}
-          text={text}
-          onClick={()=>{
-            let thepin : IPin = {
-              id: cluster.properties.pinId,
-              text: cluster.properties.text,
-              coords: cluster.geometry.coordinates
-            }
-            setPinModal(thepin)
-            // console.log("clicked on!", cluster.properties)
-          }}
-        />
-
-      }
-    })
-  }
+  useEffect(()=> {
+    const isProd = location.host.indexOf(".vercel.app") > -1;
+    const rep = new Replicache<MutatorDefs>({
+      pushURL: '/api/push-pins',
+      pullURL: '/api/pull-pins',
+      wasmModule: isProd ? "/replicache.wasm" : "/replicache.dev.wasm",
+      name: "fruit",
+      mutators
+    });
+    listen(rep, repConfig);
+    setRep(rep);
+  }, [])
 
   return (
-    <Provider store={store}>
-      <div className="App">
-        <Header/>
+    <div className="App">
+
+      {rep &&
         <div className="body">
-          <GoogleMapReact
-            yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: googleKey }}
-            center={map.center}
-            zoom={map.zoom}
-            onClick={handleMapClick}
-            onGoogleApiLoaded={({map}) => {
-              mapRef.current = map;
-            }}
-            onChange={ ( { zoom , bounds } ) => {
-              setZoom(zoom)
-              setBounds([
-                bounds.nw.lng,
-                bounds.se.lat,
-                bounds.se.lng,
-                bounds.nw.lat,
-              ])
-            }}
-          >
-            {renderMarkers()}
-          </GoogleMapReact>
+
+          <Header
+            rep={rep}
+          />
+
+          <Map
+            isShown={isShown}
+            map={map}
+            mapRef={mapRef}
+            setZoom={setZoom}
+            setBounds={setBounds}
+            toggle={toggle}
+            clusters={clusters}
+            supercluster={supercluster}
+            allPoints={allPoints}
+            setPinModal={setPinModal}
+          />
 
           <PinFormModal
             isShown={isShown}
             modalPinCoords={modalPinCoords}
             hide={toggle}
-            clearPins={handleClearPins}
+            clearPins={props.clearPins}
             mapRef={mapRef.current}
+            rep={rep}
           />
 
           <PinModal
             pin={activePin}
             hide={setPinModal}
           />
-        </div>
 
-      </div>
-    </Provider>
+        </div>
+      }
+
+    </div>
   );
 }
 

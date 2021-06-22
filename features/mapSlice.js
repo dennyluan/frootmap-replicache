@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ICoords, IPin } from "../models/pins";
+import { ICoords, IPin } from "../models/types";
 
 const mapSlice = createSlice({
   name: 'map',

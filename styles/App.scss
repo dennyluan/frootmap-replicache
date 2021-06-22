@@ -1,3 +1,5 @@
+@import 'modal';
+
 .App {
   text-align: center;
 }
@@ -21,33 +23,6 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-}
-
-.body {
-  height: 100vh;
-  width: 100vw;
-}
-
-.modal {
-  position: relative !important;
-  margin: 0 auto !important;
-  display: block !important;
-  width: 85vw !important;
-}
-
-.modal-dialog {
-  height: calc(100vh - 20%);
-  max-width: 100vw !important;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px !important;
-  border: none !important;
-  box-shadow: 0 3px 19px -9px #777;
-  width: 92% !important;
-  margin: 0 auto !important;
-  height: 100%;
 }
 
 .svg-inline--fa {
@@ -114,4 +89,12 @@
 a[title="Report errors in the road map or imagery to Google"],
 img[src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5.png"] {
   display: none !important;
+}
+
+.navbar {
+  position: absolute;
+  padding: 0.5rem 1rem;
+  width: 100vw;
+  z-index: 10;
+  border-bottom: 1px solid #eee;
 }

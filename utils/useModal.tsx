@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ICoords, IPin } from "../models/pins";
+import { ICoords, IPin } from "../models/types";
 
 export const useFormModal = () => {
   const [isShown, setIsShown] = useState<boolean>(false);

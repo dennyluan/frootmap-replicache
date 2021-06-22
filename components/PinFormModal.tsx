@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { connect } from 'react-redux'
 
-import Modal, { Styles } from "react-modal";
+import Modal from "react-modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
+import { useSwipeable } from "react-swipeable";
 
-import { ICoords } from "../models/pins";
+import { ICoords } from "../models/types";
 import { createPin } from "../features/pinSlice";
 import { setMap } from "../features/mapSlice";
+
+import {Replicache} from 'replicache';
 
 Modal.setAppElement("#root");
 
@@ -17,7 +20,8 @@ interface IPinModalProps {
   modalPinCoords: ICoords,
   mapRef: any,
   hide: () => void,
-  clearPins: () => void
+  clearPins: () => void,
+  rep: Replicache
 }
 
 const PinFormModal = (props: IPinModalProps) => {
@@ -26,6 +30,14 @@ const PinFormModal = (props: IPinModalProps) => {
   const [error, setError] = useState<string>("");
 
   const dispatch = useDispatch()
+
+  const handlers = useSwipeable({
+    onSwiped: (eventData) => {
+      handleClose()
+    },
+    trackMouse: true,
+    preventDefaultTouchmoveEvent: true
+  });
 
   const FRUITS = [
     "Mango",
@@ -52,6 +64,11 @@ const PinFormModal = (props: IPinModalProps) => {
   //     document.removeEventListener('keydown', onKeyDown, false);
   //   };
   // }, [isShown]);
+
+  const handleClearPins = () : void => {
+    props.clearPins()
+    // toggle()
+  }
 
   function renderFruits() {
     return FRUITS.map((f, i) => {
@@ -80,13 +97,22 @@ const PinFormModal = (props: IPinModalProps) => {
   function handleClick() {
     let value = fruit || titleInput || null
     if (value) {
-      // createPin(fruit);
+      // const coords = [props.modalPinCoords.lat, props.modalPinCoords.lng]
 
       const payload = {
         pinCoords: props.modalPinCoords,
         text: value
       }
+
+      // props.rep.mutate.
+      //   text: "pandan",
+      //   order: 1,
+      //   coords: props.modalPinCoords })
+
+      // todo: move rep to redux state?
       dispatch(createPin(payload))
+
+      // OPTION 3 just call rep.mutate here
 
       handleClose();
     } else {
@@ -108,7 +134,7 @@ const PinFormModal = (props: IPinModalProps) => {
         onRequestClose={() => handleClose()}
         shouldCloseOnOverlayClick={true}
       >
-        <div className="modal-dialog">
+        <div {...handlers} className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Choose a fruit:</h5>
@@ -116,16 +142,9 @@ const PinFormModal = (props: IPinModalProps) => {
                 icon={faTimesCircle}
                 onClick={props.hide}
                 aria-label="Close"
-                className="btn-close"
+                className="close"
               />
-              <br/>
-              <p className="muted">
-                Coordinates:
-                <span className="mr-3">Lat: {props.modalPinCoords.lat}</span>
-                <span>Lng: {props.modalPinCoords.lng}</span>
-              </p>
             </div>
-
 
             <div className="modal-body">
               {error && <p className="alert alert-danger">{error}</p>}
@@ -163,7 +182,7 @@ const PinFormModal = (props: IPinModalProps) => {
 
               <button
                 className="btn btn-danger ml-3"
-                onClick={props.clearPins}
+                onClick={handleClearPins}
               >
                 Clear pins
               </button>
@@ -185,6 +204,13 @@ const PinFormModal = (props: IPinModalProps) => {
             </div>
           </div>
         </div>
+
+        <p className="muted mt-5 position-absolute text-center w-100">
+          Coordinates:
+          <span className="mr-3">Lat: {props.modalPinCoords.lat}</span>
+          <span>Lng: {props.modalPinCoords.lng}</span>
+        </p>
+
       </Modal>
     </div>
   );

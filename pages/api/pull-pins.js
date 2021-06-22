@@ -2,11 +2,15 @@ import {db} from '../../db.js';
 
 export default async (req, res) => {
   const pull = req.body;
-  console.log(`Processing pull`, JSON.stringify(pull, null, ''));
+  console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
   const t0 = Date.now();
 
   try {
+    console.log("[pull]!", pull)
     db.tx(async t => {
+
+
+      // get the lastmutationID
       const lastMutationID = parseInt(
         (
           await db.oneOrNone(
@@ -15,15 +19,18 @@ export default async (req, res) => {
           )
         )?.last_mutation_id ?? '0',
       );
+
+      // get any new txs
       const changed = await db.manyOrNone(
-        'select id, sender, content, ord from message where version > $1',
+        'select id, sender, text, ord from pin where version > $1',
         parseInt(pull.cookie ?? 0),
       );
       const cookie = (
-        await db.one('select max(version) as version from message')
+        await db.one('select max(version) as version from pin')
       ).version;
       console.log({cookie, lastMutationID, changed});
 
+      // if no cookie, then clear
       const patch = [];
       if (pull.cookie === null) {
         patch.push({
@@ -31,12 +38,13 @@ export default async (req, res) => {
         });
       }
 
+      // push all pending changes as patches
       patch.push(...changed.map(row => ({
           op: 'put',
-          key: `message/${row.id}`,
+          key: `pin/${row.id}`,
           value: {
             from: row.sender,
-            content: row.content,
+            text: row.text,
             order: parseInt(row.ord),
           },
         })));
@@ -48,10 +56,11 @@ export default async (req, res) => {
       });
       res.end();
     });
+
   } catch (e) {
     console.error(e);
     res.status(500).send(e.toString());
   } finally {
-    console.log('Processed pull in', Date.now() - t0);
+    console.log(' [pull] >>>> Processed pull in', Date.now() - t0);
   }
 };

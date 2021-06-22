@@ -1,8 +1,13 @@
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
-import { ICoords, IPin } from "../models/pins";
+import { ICoords, IPin } from "../models/types";
 import { v4 as uuidv4 } from "uuid";
 
 import find from 'lodash/find'
+
+// replace the 'state: any' with actual pin state
+interface PinState {
+  pins: IPin[]
+}
 
 const newPin = (pinCoords : ICoords, text : string) => {
   const id = uuidv4()
@@ -16,11 +21,12 @@ const newPin = (pinCoords : ICoords, text : string) => {
   }
 }
 
-interface PinState {
-  pins: IPin[]
-}
-
 const initialState : IPin[] = []
+
+interface CreatePinPayload {
+  pinCoords: ICoords,
+  text: string
+}
 
 const pinSlice = createSlice({
   name: 'pins',
@@ -30,7 +36,7 @@ const pinSlice = createSlice({
       const localPins : string = localStorage.getItem('localPins') || '[]'
       const localPinsParsed : IPin[] = JSON.parse(localPins)
 
-      console.log("loading pins", localPinsParsed)
+      console.log("[loading localstorage pins]", localPinsParsed)
 
       if (localPinsParsed) {
         const newPins : IPin[] = []
@@ -39,7 +45,6 @@ const pinSlice = createSlice({
       } else {
         return []
       }
-
     },
 
     fetchAllPins(state, action) {
@@ -47,7 +52,10 @@ const pinSlice = createSlice({
       return action.payload.pins
     },
 
-    createPin(state: any, action: PayloadAction<any>) {
+    // ts: PayloadAction<> should be the shape of the payload?
+    //    { pinCoords: ?, text: ?, rep: Replicache<MD> }
+    // ts: Replicache<> should have the type what?
+    createPin(state: any, action: PayloadAction<CreatePinPayload>) {
       const { pinCoords, text } = action.payload
       const newState = state.concat([newPin(pinCoords, text)])
       localStorage.setItem('localPins', JSON.stringify(newState));

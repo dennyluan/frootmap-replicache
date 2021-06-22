@@ -1,5 +1,5 @@
 import React from "react";
-import { IPin } from "../models/pins";
+import { IPin } from "../models/types";
 
 const ClusterMarker = ( cluster : any ) => {
 

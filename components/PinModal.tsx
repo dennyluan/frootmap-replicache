@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import Modal, { Styles } from "react-modal";
-import { IPin } from "../models/pins"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { useSwipeable } from "react-swipeable";
+
+import { IPin } from "../models/types"
 
 import { useDispatch } from "react-redux";
 import { deletePin } from '../features/pinSlice'
+
 
 Modal.setAppElement("#root");
 
@@ -18,6 +21,14 @@ interface ModalProps {
 }
 
 const PinModal = ( props: ModalProps ) => {
+
+  const handlers = useSwipeable({
+    onSwiped: (eventData) => {
+      handleClose()
+    },
+    trackMouse: true,
+    preventDefaultTouchmoveEvent: true
+  });
 
   const dispatch = useDispatch()
   const { pin } = props;
@@ -40,8 +51,10 @@ const PinModal = ( props: ModalProps ) => {
     onRequestClose={() => handleClose()}
     shouldCloseOnOverlayClick={true}
   >
-
-    <div className="modal-dialog">
+    <div
+      className="modal-dialog"
+      {...handlers}
+    >
       <div className="modal-content">
         <div className="modal-header">
           <h3>{pin && pin.text}</h3>
@@ -49,12 +62,13 @@ const PinModal = ( props: ModalProps ) => {
             icon={faTimesCircle}
             onClick={() => handleClose()}
             aria-label="Close"
-            className="btn-close"
+            className="close"
           />
         </div>
         <div className="modal-body">
           <p>About this pin:</p>
           <h4>{pin && pin.text}</h4>
+          <p><label>ID:</label> {pin && pin.id}</p>
           <button
             className="btn btn-danger mv-3"
             onClick={() => handleDelete()}

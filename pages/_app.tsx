@@ -9,7 +9,6 @@ import store from "../utils/store";
 import { Provider } from "react-redux";
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   return (
     <div id="root">
       <Provider store={store}>

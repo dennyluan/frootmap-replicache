@@ -1,5 +1,5 @@
 import React from "react";
-import { IPin } from "../models/pins";
+import { IPin } from "../models/types";
 
 interface PinMarkerProps {
   pin?: IPin,
@@ -7,8 +7,8 @@ interface PinMarkerProps {
   onClick: () => void,
   id: any,
   text: any,
-  lat: string,
-  lng: string
+  lat: number,
+  lng: number
 }
 
 const PinMarker = ( props: PinMarkerProps ) => {
