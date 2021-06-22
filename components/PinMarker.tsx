@@ -2,10 +2,9 @@ import React from "react";
 import { IPin } from "../models/types";
 
 interface PinMarkerProps {
-  pin?: IPin,
+  // pin?: IPin,
   style?: any,
   onClick: () => void,
-  id: any,
   text: any,
   lat: number,
   lng: number
@@ -13,9 +12,10 @@ interface PinMarkerProps {
 
 const PinMarker = ( props: PinMarkerProps ) => {
 
+  console.log("pinmarker props", props)
+
   const clickHandler = () => {
     props.onClick()
-    // console.log("clicked on pin")
   }
 
   return (

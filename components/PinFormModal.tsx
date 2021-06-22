@@ -39,6 +39,8 @@ const PinFormModal = (props: IPinModalProps) => {
     preventDefaultTouchmoveEvent: true
   });
 
+    console.log("modalPinCoords", props.modalPinCoords)
+
   const FRUITS = [
     "Mango",
     "Pineapple",

@@ -59,8 +59,10 @@ const Map = (props: MapProps) => {
       const {
         cluster: isCluster,
         point_count: pointCount,
-        text: text
+        text: text,
       } = cluster.properties;
+
+      console.log("cluster!!", cluster)
 
       if (isCluster) {
 
@@ -85,17 +87,19 @@ const Map = (props: MapProps) => {
 
         return <PinMarker
           key={index}
-          id={cluster.properties.id}
           lat={lat}
           lng={lng}
           text={text}
           onClick={()=>{
-            let thepin : IPin = {
+            const pin : IPin = {
               id: cluster.properties.pinId,
               text: cluster.properties.text,
-              coords: cluster.geometry.coordinates
+              coords: {
+                lat: cluster.properties[0],
+                lng: cluster.properties[1]
+              }
             }
-            props.setPinModal(thepin)
+            props.setPinModal(pin)
           }}
         />
 

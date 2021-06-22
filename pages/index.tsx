@@ -34,6 +34,7 @@ function App(props: any) {
   let allPoints : IPoint[] = []
 
   console.log("props.pins", props.pins)
+  console.log("activePin", activePin)
   if (props.pins && props.pins.length > 1) {
     allPoints = props.pins.map( (pin : IPin) => ({
       "type": "Feature",
@@ -47,9 +48,11 @@ function App(props: any) {
         "coordinates": [
           pin.coords.lng,
           pin.coords.lat
-          // pin.coords[0],
-          // pin.coords[1]
         ]
+        // "coordinates": {
+        //   "lng": pin.coords.lng,
+        //   "lat": pin.coords.lat
+        // }
       }
     }))
   }

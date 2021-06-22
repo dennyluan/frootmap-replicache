@@ -32,8 +32,6 @@ export interface IPoint {
      * For less than 1000 points it is the same value as `point_count`.
      */
     point_count_abbreviated?: string | number;
-
-
   },
   geometry: {
     type: 'Point',
