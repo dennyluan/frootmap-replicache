@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent, useRef } from "react";
+import React, { useEffect, useState, MouseEvent, useRef, createContext } from "react";
 import { useSelector, useDispatch, connect, Provider } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import useSupercluster from 'use-supercluster';
@@ -13,29 +13,31 @@ import { useFormModal, usePinModal } from "../utils/useModal";
 import { loadPins, clearPins, selectPins } from '../features/pinSlice'
 import store from "./../utils/store";
 
-import { listen } from './../utils/rep';
-import { Replicache, WriteTransaction, MutatorDefs } from 'replicache';
+import { Replicache, MutatorDefs } from 'replicache';
 import { useSubscribe } from 'replicache-react-util';
 import * as Pusher from 'pusher-js';
-import { mutators } from './../features/mutators'
 
+import dynamic from 'next/dynamic';
+const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
 function App(props: any) {
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
   const [ viewCoords, setViewCoords ] = useState<ICoords>({ lat: 21.284084348268202, lng: -157.7855795839304 });
-  const { isShown, toggle, modalPinCoords } = useFormModal();
-  const { activePin, setPinModal } = usePinModal();
+  const { isShown, togglePinFormModal, modalPinCoords } = useFormModal();
+  const { activePin, togglePinModal } = usePinModal();
   const { map } = useSelector( ( state: { map: any } ) => state.map );
   const mapRef = useRef<any>(null);
   const [bounds, setBounds] = useState<any>(null)
   const [zoom, setZoom] = useState<number>(16);
+  const [rep, setRep] = useState<Replicache<MutatorDefs>>();
+
+  const [ data, setData ] = useState<any>();
 
   let allPoints : IPoint[] = []
 
   console.log("props.pins", props.pins)
-  console.log("activePin", activePin)
-  if (props.pins && props.pins.length > 1) {
+  if (props.pins && props.pins.length > 0) {
     allPoints = props.pins.map( (pin : IPin) => ({
       "type": "Feature",
       "properties": {
@@ -67,9 +69,6 @@ function App(props: any) {
     }
   })
 
-  console.log("clusters", clusters)
-
-  const [rep, setRep] = useState<Replicache>();
 
   useEffect(() => {
     // set the map location from browser
@@ -82,7 +81,6 @@ function App(props: any) {
           });
         },
         () => {
-          console.log("map geo error");
         }
       );
     }
@@ -91,64 +89,52 @@ function App(props: any) {
     props.loadPins()
   }, []);
 
-  const repConfig = {
-    key: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_KEY,
-    cluster: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_CLUSTER
-  }
-
-  useEffect(()=> {
-    const isProd = location.host.indexOf(".vercel.app") > -1;
-    const rep = new Replicache<MutatorDefs>({
-      pushURL: '/api/push-pins',
-      pullURL: '/api/pull-pins',
-      wasmModule: isProd ? "/replicache.wasm" : "/replicache.dev.wasm",
-      name: "fruit",
-      mutators
-    });
-    listen(rep, repConfig);
-    setRep(rep);
-  }, [])
+  console.log("rep", rep)
 
   return (
     <div className="App">
 
+      {/*
+        this order matters :(
+      */}
+      <RepContainerDynamic setRep={setRep}/>
       {rep &&
+
         <div className="body">
+            <Header
+              rep={rep}
+            />
 
-          <Header
-            rep={rep}
-          />
+            <Map
+              isShown={isShown}
+              map={map}
+              mapRef={mapRef}
+              setZoom={setZoom}
+              setBounds={setBounds}
+              clusters={clusters}
+              supercluster={supercluster}
+              allPoints={allPoints}
+              togglePinFormModal={togglePinFormModal}
+              togglePinModal={togglePinModal}
+              rep={rep}
+            />
 
-          <Map
-            isShown={isShown}
-            map={map}
-            mapRef={mapRef}
-            setZoom={setZoom}
-            setBounds={setBounds}
-            toggle={toggle}
-            clusters={clusters}
-            supercluster={supercluster}
-            allPoints={allPoints}
-            setPinModal={setPinModal}
-          />
+            <PinFormModal
+              isShown={isShown}
+              modalPinCoords={modalPinCoords}
+              togglePinFormModal={togglePinFormModal}
+              clearPins={props.clearPins}
+              mapRef={mapRef.current}
+              rep={rep}
+            />
 
-          <PinFormModal
-            isShown={isShown}
-            modalPinCoords={modalPinCoords}
-            hide={toggle}
-            clearPins={props.clearPins}
-            mapRef={mapRef.current}
-            rep={rep}
-          />
-
-          <PinModal
-            pin={activePin}
-            hide={setPinModal}
-          />
+            <PinModal
+              pin={activePin}
+              togglePinModal={togglePinModal}
+            />
 
         </div>
       }
-
     </div>
   );
 }
@@ -168,4 +154,6 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(App)
+
+
 

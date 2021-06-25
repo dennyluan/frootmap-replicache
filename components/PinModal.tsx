@@ -17,7 +17,7 @@ Modal.setAppElement("#root");
 interface ModalProps {
   // pin?: IPin,
   pin?: any,
-  hide: () => void,
+  togglePinModal: () => void,
 }
 
 const PinModal = ( props: ModalProps ) => {
@@ -36,12 +36,12 @@ const PinModal = ( props: ModalProps ) => {
   let open = (pin && pin.id != undefined) || false
 
   function handleClose() {
-    props.hide();
+    props.togglePinModal();
   }
 
   function handleDelete() {
     dispatch(deletePin(pin.id))
-    props.hide()
+    props.togglePinModal()
   }
 
   return <Modal

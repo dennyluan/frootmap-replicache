@@ -12,8 +12,6 @@ interface PinMarkerProps {
 
 const PinMarker = ( props: PinMarkerProps ) => {
 
-  console.log("pinmarker props", props)
-
   const clickHandler = () => {
     props.onClick()
   }

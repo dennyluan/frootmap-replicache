@@ -11,7 +11,7 @@ import { ICoords } from "../models/types";
 import { createPin } from "../features/pinSlice";
 import { setMap } from "../features/mapSlice";
 
-import {Replicache} from 'replicache';
+import { Replicache, MutatorDefs } from 'replicache';
 
 Modal.setAppElement("#root");
 
@@ -19,9 +19,9 @@ interface IPinModalProps {
   isShown: boolean,
   modalPinCoords: ICoords,
   mapRef: any,
-  hide: () => void,
+  togglePinFormModal: () => void,
   clearPins: () => void,
-  rep: Replicache
+  rep: Replicache<MutatorDefs>
 }
 
 const PinFormModal = (props: IPinModalProps) => {
@@ -38,8 +38,6 @@ const PinFormModal = (props: IPinModalProps) => {
     trackMouse: true,
     preventDefaultTouchmoveEvent: true
   });
-
-    console.log("modalPinCoords", props.modalPinCoords)
 
   const FRUITS = [
     "Mango",
@@ -69,7 +67,6 @@ const PinFormModal = (props: IPinModalProps) => {
 
   const handleClearPins = () : void => {
     props.clearPins()
-    // toggle()
   }
 
   function renderFruits() {
@@ -93,7 +90,17 @@ const PinFormModal = (props: IPinModalProps) => {
     setFruit("");
     setError("");
     setTitleInput("");
-    props.hide();
+    props.togglePinFormModal();
+  }
+
+  // todo: form payload
+  function repCreatePin(payload: any) {
+    props.rep.mutate.createPin({
+      id: Math.random().toString(32).substr(2),
+      order: 1,
+      text: "pandan",
+      coords: props.modalPinCoords
+    });
   }
 
   function handleClick() {
@@ -106,15 +113,10 @@ const PinFormModal = (props: IPinModalProps) => {
         text: value
       }
 
-      // props.rep.mutate.
-      //   text: "pandan",
-      //   order: 1,
-      //   coords: props.modalPinCoords })
-
       // todo: move rep to redux state?
       dispatch(createPin(payload))
 
-      // OPTION 3 just call rep.mutate here
+      repCreatePin(payload)
 
       handleClose();
     } else {
@@ -142,7 +144,7 @@ const PinFormModal = (props: IPinModalProps) => {
               <h5 className="modal-title">Choose a fruit:</h5>
               <FontAwesomeIcon
                 icon={faTimesCircle}
-                onClick={props.hide}
+                onClick={handleClose}
                 aria-label="Close"
                 className="close"
               />

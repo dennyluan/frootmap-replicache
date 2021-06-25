@@ -6,6 +6,8 @@ import {PointFeature, ClusterProperties, AnyProps, ClusterFeature} from 'supercl
 import PinMarker from "./../components/PinMarker";
 import ClusterMarker from "../components/ClusterMarker";
 
+import { Replicache, MutatorDefs } from 'replicache';
+import { useSubscribe } from 'replicache-react-util';
 
 interface thing {
   cluster: true | boolean
@@ -22,15 +24,25 @@ interface MapProps {
   isShown: boolean,
   setZoom: (zoom: number) => void,
   setBounds: (bounds: any) => void,
-  toggle: (coords: any) => void,
-  setPinModal: (pin: IPin) => void,
+  togglePinFormModal: (coords: any) => void,
+  togglePinModal: (pin: IPin) => void,
   clusters: (PointFeature<thing> | PointFeature<ClusterProperties & AnyProps>)[],
   allPoints: IPoint[] | [],
   supercluster: any
+  rep: Replicache<MutatorDefs>
 }
 
 const Map = (props: MapProps) => {
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+
+
+  const pins = useSubscribe(
+    props.rep,
+    tx => tx.scan({prefix: '/pins/'}).toArray(),
+    [],
+  );
+
+  console.log("<<rep pins>>", pins)
 
   const handleMapClick = ({
     x,
@@ -47,7 +59,7 @@ const Map = (props: MapProps) => {
   }): any => {
     event.preventDefault();
     if (!props.isShown)
-      props.toggle({lat: lat, lng: lng})
+      props.togglePinFormModal({lat: lat, lng: lng})
   };
 
   function renderMarkers() {
@@ -61,8 +73,6 @@ const Map = (props: MapProps) => {
         point_count: pointCount,
         text: text,
       } = cluster.properties;
-
-      console.log("cluster!!", cluster)
 
       if (isCluster) {
 
@@ -83,8 +93,6 @@ const Map = (props: MapProps) => {
 
       } else {
 
-        console.log("cluster.geometry.coordinates", cluster.geometry.coordinates)
-
         return <PinMarker
           key={index}
           lat={lat}
@@ -99,7 +107,7 @@ const Map = (props: MapProps) => {
                 lng: cluster.properties[1]
               }
             }
-            props.setPinModal(pin)
+            props.togglePinModal(pin)
           }}
         />
 

@@ -13,18 +13,19 @@ import { useSwipeable } from "react-swipeable";
 
 export default function Header(props) {
 
-  const pins = useSubscribe(
-    props.rep,
-    async tx => {
-      // Note: Replicache also supports secondary indexes, which can be used
-      // with scan. See:
-      // https://js.replicachedev/classes/replicache.html#createindex
-      const list = await tx.scan({prefix: 'pin/'}).entries().toArray();
-      list.sort(([, {order: a}], [, {order: b}]) => a - b);
-      return list;
-    },
-    [],
-  );
+  let pins
+  // const pins = useSubscribe(
+  //   props.rep,
+  //   async tx => {
+  //     // Note: Replicache also supports secondary indexes, which can be used
+  //     // with scan. See:
+  //     // https://js.replicachedev/classes/replicache.html#createindex
+  //     const list = await tx.scan({prefix: 'pin/'}).entries().toArray();
+  //     list.sort(([, {order: a}], [, {order: b}]) => a - b);
+  //     return list;
+  //   },
+  //   [],
+  // );
 
   // console.log('pins', pins)
 
@@ -32,7 +33,7 @@ export default function Header(props) {
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
 
-      <PinList pins={pins} />
+      {/*<PinList pins={pins} />*/}
 
       <button className="btn btn-primary" onClick={() => handleClick()}>
         Create pin
