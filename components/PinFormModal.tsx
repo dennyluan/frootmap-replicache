@@ -11,6 +11,7 @@ import { ICoords } from "../models/types";
 import { createPin } from "../features/pinSlice";
 import { setMap } from "../features/mapSlice";
 
+import { useSubscribe } from 'replicache-react-util';
 import { Replicache, MutatorDefs } from 'replicache';
 
 Modal.setAppElement("#root");
@@ -86,6 +87,19 @@ const PinFormModal = (props: IPinModalProps) => {
     );
   }
 
+  const pins = useSubscribe(
+    props.rep,
+    async tx => {
+      const thepins = await tx.scan({prefix: 'pin/'}).entries().toArray();
+      thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
+      return thepins;
+    },
+    [],
+  );
+
+  console.log("REP PINS", pins)
+
+
   function handleClose() {
     setFruit("");
     setError("");
@@ -93,14 +107,34 @@ const PinFormModal = (props: IPinModalProps) => {
     props.togglePinFormModal();
   }
 
+  // console.log(" props.modalPinCoords",  props.modalPinCoords)
+
   // todo: form payload
   function repCreatePin(payload: any) {
-    props.rep.mutate.createPin({
-      id: Math.random().toString(32).substr(2),
-      order: 1,
-      text: "pandan",
-      coords: props.modalPinCoords
-    });
+
+    let order;
+
+    const last = pins.length && pins[pins.length - 1][1];
+    order = (last?.order ?? 0) + 1;
+
+    let id = Math.random().toString(32).substr(2)
+
+    let {lat, lng} = props.modalPinCoords
+    let value = fruit || titleInput || null
+
+    const newpayload = {
+      id: id,
+      sender: "Denny",
+      description: "A fruit",
+      ord: order,
+      text: value,
+      lat: lat,
+      lng: lng
+    }
+
+    console.log("payload", newpayload)
+
+    props.rep.mutate.createPin({...newpayload});
   }
 
   function handleClick() {
@@ -114,7 +148,7 @@ const PinFormModal = (props: IPinModalProps) => {
       }
 
       // todo: move rep to redux state?
-      dispatch(createPin(payload))
+      // dispatch(createPin(payload))
 
       repCreatePin(payload)
 

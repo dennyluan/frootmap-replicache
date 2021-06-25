@@ -1,5 +1,16 @@
 import {db} from '../../db.js';
 
+
+// |pins|
+// id                 varchar
+// text               text
+// description        text
+// version            int8
+// sender             varchar
+// ord                int8
+// lat                float8
+// lng                float8
+
 export default async (req, res) => {
   const pull = req.body;
   console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));

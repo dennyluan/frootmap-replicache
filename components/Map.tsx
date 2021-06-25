@@ -38,11 +38,15 @@ const Map = (props: MapProps) => {
 
   const pins = useSubscribe(
     props.rep,
-    tx => tx.scan({prefix: '/pins/'}).toArray(),
+    async tx => {
+      const thepins = await tx.scan({prefix: 'pin/'}).entries().toArray();
+      thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
+      return thepins;
+    },
     [],
   );
 
-  console.log("<<rep pins>>", pins)
+  // console.log("<<rep pins>>", pins)
 
   const handleMapClick = ({
     x,

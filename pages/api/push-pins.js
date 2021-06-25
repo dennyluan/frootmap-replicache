@@ -1,17 +1,16 @@
-import {db} from '../../db.js';
+import Pusher from 'pusher';
+
+import {getDB} from './db';
 
 export default async (req, res) => {
   const push = req.body;
-  console.log("i am pushing! 1")
-
-  console.log(' [push] >>> Processing push', JSON.stringify(push, null, ''));
+  console.log('Processing push', JSON.stringify(push, null, ''));
 
   const t0 = Date.now();
   try {
+    const db = await getDB();
     await db.tx(async t => {
       const {nextval: version} = await db.one("SELECT nextval('version')");
-
-      // 1 set a lastMutationID
       let lastMutationID = parseInt(
         (
           await db.oneOrNone(
@@ -21,48 +20,46 @@ export default async (req, res) => {
         )?.last_mutation_id ?? '0',
       );
 
-      // 1a if there is no lastMutationID, then create a new replicache_client
       if (!lastMutationID) {
         await db.none(
           'INSERT INTO replicache_client (id, last_mutation_id) VALUES ($1, $2)',
           [push.clientID, lastMutationID],
         );
       }
-
-      console.log('[push] version', version, 'lastMutationID:', lastMutationID);
+      console.log('version', version, 'lastMutationID:', lastMutationID);
 
       for (let i = 0; i < push.mutations.length; i++) {
         const t1 = Date.now();
 
-        const localMutation = push.mutations[i];
+        const mutation = push.mutations[i];
         const expectedMutationID = lastMutationID + 1;
 
-        if (localMutation.id < expectedMutationID) {
+        if (mutation.id < expectedMutationID) {
           console.log(
             `Mutation ${mutation.id} has already been processed - skipping`,
           );
           continue;
         }
-        if (localMutation.id > expectedMutationID) {
-          console.warn(`Mutation ${localMutation.id} is from the future - aborting`);
+        if (mutation.id > expectedMutationID) {
+          console.warn(`Mutation ${mutation.id} is from the future - aborting`);
           break;
         }
 
-        console.log('[push] Processing mutation:', JSON.stringify(localMutation, null, ''));
+        console.log('Processing mutation:', JSON.stringify(mutation, null, ''));
 
-        switch (localMutation.name) {
+        switch (mutation.name) {
           case 'createMessage':
-            await createMessage(db, localMutation.args, version);
+            await createMessage(db, mutation.args, version);
             break;
           default:
-            throw new Error(`Unknown mutation: ${localMutation.name}`);
+            throw new Error(`Unknown mutation: ${mutation.name}`);
         }
 
         lastMutationID = expectedMutationID;
         console.log('Processed mutation in', Date.now() - t1);
       }
 
-      // await sendPoke();
+      await sendPoke();
 
       console.log(
         'setting',
@@ -74,22 +71,22 @@ export default async (req, res) => {
         'UPDATE replicache_client SET last_mutation_id = $2 WHERE id = $1',
         [push.clientID, lastMutationID],
       );
-      res.send('{}');
+      res.send('ok');
     });
   } catch (e) {
-    console.error(" [push error] >>", e);
+    console.error(e);
     res.status(500).send(e.toString());
   } finally {
-    console.log(' [push] >> Processed push in', Date.now() - t0);
+    console.log('Processed push in', Date.now() - t0);
   }
 };
 
-async function createMessage(db, {id, from, text, order}, version) {
+async function createMessage(db, {id, from, content, order}, version) {
   await db.none(
     `INSERT INTO message (
-    id, sender, text, ord, version) values
+    id, sender, content, ord, version) values
     ($1, $2, $3, $4, $5)`,
-    [id, from, text, order, version],
+    [id, from, content, order, version],
   );
 }
 

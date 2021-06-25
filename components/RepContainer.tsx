@@ -19,8 +19,8 @@ const RepContainer = (props: any) => {
     isProd = location.host.indexOf(".vercel.app") > -1;
 
     const rep = new Replicache<MutatorDefs>({
-      pushURL: '/api/push-pins',
-      pullURL: '/api/pull-pins',
+      pushURL: '/api/supa-push',
+      pullURL: '/api/supa-pull',
       wasmModule: isProd ? "/replicache.wasm" : "/replicache.dev.wasm",
       name: "fruit",
       mutators

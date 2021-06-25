@@ -29,7 +29,10 @@ export default async (_, res) => {
       id VARCHAR(20) PRIMARY KEY NOT NULL,
       text TEXT NOT NULL,
       description TEXT NOT NULL,
-      order BIGINT NOT NULL,
+      ord BIGINT NOT NULL,
+      sender VARCHAR(255) NOT NULL,
+      lat NUMERIC NOT NULL,
+      lng NUMERIC NOT NULL,
       version BIGINT NOT NULL)`);
     // Stores last mutation ID for each Replicache client
     await t.none(`CREATE TABLE replicache_client (

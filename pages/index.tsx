@@ -36,7 +36,20 @@ function App(props: any) {
 
   let allPoints : IPoint[] = []
 
-  console.log("props.pins", props.pins)
+
+  // useSubscribe(rep, f, def)
+  // const thing = useSubscribe(
+  //   rep,
+  //   async tx => {
+  //     const thepins = await tx.scan({prefix: 'pin/'}).entries().toArray();
+  //     thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
+  //     return thepins;
+  //   },
+  //   [],
+  // );
+
+
+  // console.log("props.pins", props.pins)
   if (props.pins && props.pins.length > 0) {
     allPoints = props.pins.map( (pin : IPin) => ({
       "type": "Feature",
@@ -89,7 +102,7 @@ function App(props: any) {
     props.loadPins()
   }, []);
 
-  console.log("rep", rep)
+  // console.log("rep", rep)
 
   return (
     <div className="App">

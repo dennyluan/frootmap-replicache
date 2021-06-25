@@ -4,8 +4,8 @@ import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 
 import * as Pusher from 'pusher-js';
-import {Replicache} from 'replicache';
-import {useSubscribe} from 'replicache-react-util';
+import { Replicache } from 'replicache';
+import { useSubscribe } from 'replicache-react-util';
 
 import { useSwipeable } from "react-swipeable";
 
@@ -13,7 +13,7 @@ import { useSwipeable } from "react-swipeable";
 
 export default function Header(props) {
 
-  let pins
+  // let pins
   // const pins = useSubscribe(
   //   props.rep,
   //   async tx => {
@@ -27,13 +27,34 @@ export default function Header(props) {
   //   [],
   // );
 
-  // console.log('pins', pins)
+  const pins = useSubscribe(
+    props.rep,
+    async tx => {
+      const thepins = await tx.scan({prefix: 'pins/'}).entries().toArray();
+      thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
+      return thepins;
+    },
+    [],
+  );
+
+
+  // console.log('header rep pins', pins)
+
+  function handleClick(){
+    return null
+  }
 
   return (
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
 
       {/*<PinList pins={pins} />*/}
+
+
+      {pins.map( (p) => {
+        return <p>pin: {p.id}</p>
+      })}
+
 
       <button className="btn btn-primary" onClick={() => handleClick()}>
         Create pin
