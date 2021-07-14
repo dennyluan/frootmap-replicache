@@ -5,9 +5,15 @@ export const useFormModal = () => {
   const [isShown, setIsShown] = useState<boolean>(false);
   const [modalPinCoords, setModalPinCoords] = useState<ICoords>({lat: 0, lng: 0});
 
-  const togglePinFormModal = (coords?: ICoords) => {
+  const togglePinFormModal = (coords?: ICoords, toggle?: boolean) => {
     if (coords) { setModalPinCoords(coords) }
-    setIsShown(!isShown);
+
+    // hack for css clickthru on pinmarker
+    if (toggle != undefined) {
+      setIsShown(toggle);
+    } else {
+      setIsShown(!isShown);
+    }
   }
 
   return {

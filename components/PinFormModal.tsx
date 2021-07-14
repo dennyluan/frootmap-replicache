@@ -21,6 +21,7 @@ interface IPinModalProps {
   modalPinCoords: ICoords,
   mapRef: any,
   togglePinFormModal: () => void,
+  setSelectedViewCoords: (coords: ICoords) => void,
   clearPins: () => void,
   rep: Replicache<MutatorDefs>
 }
@@ -90,24 +91,19 @@ const PinFormModal = (props: IPinModalProps) => {
   const pins = useSubscribe(
     props.rep,
     async tx => {
-      const thepins = await tx.scan({prefix: 'pin/'}).entries().toArray();
-      thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
+      const thepins : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
       return thepins;
     },
     [],
   );
-
-  console.log("REP PINS", pins)
-
 
   function handleClose() {
     setFruit("");
     setError("");
     setTitleInput("");
     props.togglePinFormModal();
+    props.setSelectedViewCoords({lat: 0, lng: 0})
   }
-
-  // console.log(" props.modalPinCoords",  props.modalPinCoords)
 
   // todo: form payload
   function repCreatePin(payload: any) {
@@ -140,12 +136,24 @@ const PinFormModal = (props: IPinModalProps) => {
   function handleClick() {
     let value = fruit || titleInput || null
     if (value) {
-      // const coords = [props.modalPinCoords.lat, props.modalPinCoords.lng]
 
       const payload = {
         pinCoords: props.modalPinCoords,
         text: value
       }
+
+      // 1. await upload photo first
+      // 2. then repCreatePin(payload)
+
+      // async function uploadPhoto()
+      //   if resp.ok { payload.photoUrl = ""; repCreatePin(payload)
+      //   } else {
+      //     throw new Error("upload failed")
+      //   }
+      // }
+
+      // uploadPhoto().catch( e => {})
+
 
       // todo: move rep to redux state?
       // dispatch(createPin(payload))
@@ -178,7 +186,7 @@ const PinFormModal = (props: IPinModalProps) => {
               <h5 className="modal-title">Choose a fruit:</h5>
               <FontAwesomeIcon
                 icon={faTimesCircle}
-                onClick={handleClose}
+                onClick={() => handleClose()}
                 aria-label="Close"
                 className="close"
               />

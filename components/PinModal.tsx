@@ -6,11 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { useSwipeable } from "react-swipeable";
 
-import { IPin } from "../models/types"
+import { IPin, ICoords } from "../models/types"
 
-import { useDispatch } from "react-redux";
 import { deletePin } from '../features/pinSlice'
-
+import { Replicache, MutatorDefs } from 'replicache';
 
 Modal.setAppElement("#root");
 
@@ -18,6 +17,9 @@ interface ModalProps {
   // pin?: IPin,
   pin?: any,
   togglePinModal: () => void,
+  togglePinFormModal: (coords: any, toggle: any) => void,
+  setSelectedViewCoords: (coords: ICoords) => void,
+  rep: Replicache<MutatorDefs>,
 }
 
 const PinModal = ( props: ModalProps ) => {
@@ -30,17 +32,18 @@ const PinModal = ( props: ModalProps ) => {
     preventDefaultTouchmoveEvent: true
   });
 
-  const dispatch = useDispatch()
   const { pin } = props;
 
   let open = (pin && pin.id != undefined) || false
 
   function handleClose() {
+    props.togglePinFormModal({}, false);
     props.togglePinModal();
+    props.setSelectedViewCoords({lat: 0, lng: 0})
   }
 
   function handleDelete() {
-    dispatch(deletePin(pin.id))
+    props.rep.mutate.deletePin({id: pin.id})
     props.togglePinModal()
   }
 
@@ -66,15 +69,21 @@ const PinModal = ( props: ModalProps ) => {
           />
         </div>
         <div className="modal-body">
+
           <p>About this pin:</p>
           <h4>{pin && pin.text}</h4>
-          <p><label>ID:</label> {pin && pin.id}</p>
           <button
             className="btn btn-danger mv-3"
             onClick={() => handleDelete()}
           >
             Delete this pin
           </button>
+
+
+          <div className="admin">
+            <h4>Admin:</h4>
+            <p><label>ID:</label> {pin && pin.id}</p>
+          </div>
         </div>
       </div>
     </div>

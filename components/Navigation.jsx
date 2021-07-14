@@ -10,8 +10,7 @@ import { useSubscribe } from 'replicache-react-util';
 import { useSwipeable } from "react-swipeable";
 
 
-
-export default function Header(props) {
+export default function Navigation(props) {
 
   // let pins
   // const pins = useSubscribe(
@@ -48,17 +47,10 @@ export default function Header(props) {
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
 
-      {/*<PinList pins={pins} />*/}
-
-
       {pins.map( (p) => {
         return <p>pin: {p.id}</p>
       })}
 
-
-      <button className="btn btn-primary" onClick={() => handleClick()}>
-        Create pin
-      </button>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">

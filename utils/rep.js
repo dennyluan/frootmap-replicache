@@ -9,7 +9,6 @@ export function listen(rep, config) {
   const pusher = new Pusher.default(config.key, { cluster: config.cluster });
   const channel = pusher.subscribe('default');
   channel.bind('poke', () => {
-    console.log('got poked');
     rep.pull();
   });
 }

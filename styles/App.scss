@@ -1,4 +1,6 @@
 @import 'modal';
+@import 'type';
+@import 'globals';
 
 .App {
   text-align: center;
@@ -15,35 +17,50 @@
   }
 }
 
-.App-header {
-  background-color: #eee;
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-}
-
 .svg-inline--fa {
   height: 2em;
 }
 
-.pin-marker {
+.view-marker {
   color: black;
   background: white;
   font-weight: 600;
   padding: 12px 10px;
   border: 2px solid black;
-  display: inline-flex;
+  display: inline-block;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  border-radius: 5px;
+  width: 90px;
+  top: -50px;
+}
+
+.pin-marker {
+    // pointer-events: none;
+
+  color: black;
+  background: white;
+  font-weight: 600;
+  padding: 12px 10px;
+  border: 2px solid black;
+  display: inline-block;
   text-align: center;
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -50%);
   border-radius: 5px;
 
-  top: -20px;
+  top: -50px;
   position: relative;
+
+  h2 {
+    font-size: 12px;
+  }
+  h4 {
+    font-size: 12px;
+  }
 }
 
 .cluster-marker {
@@ -97,4 +114,11 @@ img[src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5.png"] {
   width: 100vw;
   z-index: 10;
   border-bottom: 1px solid #eee;
+}
+
+.admin {
+  background: #eee;
+  border-radius: 5px;
+  padding: 12px;
+  margin: 12px 0;
 }

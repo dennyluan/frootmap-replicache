@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import { Replicache, WriteTransaction, MutatorDefs } from 'replicache';
 
 import { listen } from './../utils/rep';
-
 import { mutators } from './../features/mutators'
 
 const repConfig = {
@@ -13,10 +12,9 @@ const repConfig = {
 // todo: form props
 const RepContainer = (props: any) => {
 
-  let isProd
-
   useEffect(()=> {
-    isProd = location.host.indexOf(".vercel.app") > -1;
+    const isProd = location.host.indexOf("fruit.camera") > -1;
+    console.log('isProd', isProd)
 
     const rep = new Replicache<MutatorDefs>({
       pushURL: '/api/supa-push',

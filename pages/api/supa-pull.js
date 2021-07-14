@@ -18,7 +18,7 @@ import { createClient } from '@supabase/supabase-js'
 export default async (req, res) => {
 
   const pull = req.body;
-  console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
+  // console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
   const t0 = Date.now();
 
 
@@ -36,7 +36,7 @@ export default async (req, res) => {
       );
 
       const changed = await db.manyOrNone(
-        'select id, sender, text, description, lat, lng, ord from pin where version > $1',
+        'select id, sender, text, description, lat, lng, ord, created_at, updated_at from pin where version > $1',
         parseInt(pull.cookie ?? 0),
       );
 
@@ -45,9 +45,7 @@ export default async (req, res) => {
         await db.one('select max(version) as version from pin')
       ).version;
 
-
       // console.log({cookie, lastMutationID, changed});
-
 
       const patch = [];
       if (pull.cookie === null) {
@@ -65,7 +63,11 @@ export default async (req, res) => {
             text: row.text,
             lat: row.lat,
             lng: row.lng,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            description: row.description,
             order: parseInt(row.ord),
+            id: row.id,
           },
         })));
 
@@ -80,7 +82,7 @@ export default async (req, res) => {
     console.error(e);
     res.status(500).send(e.toString());
   } finally {
-    console.log('[pull] >>>> Processed pull in', Date.now() - t0);
+    // console.log('[pull] >>>> Processed pull in', Date.now() - t0);
   }
 
 }

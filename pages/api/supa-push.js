@@ -2,6 +2,7 @@ import {db} from '../../db.js';
 import Pusher from 'pusher';
 // import { createClient } from '@supabase/supabase-js'
 // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+import { supabase } from '../../utils/supabase';
 
 // |pins|
 // id                 varchar
@@ -22,6 +23,7 @@ export default async (req, res) => {
   try {
     await db.tx(async t => {
       const {nextval: version} = await db.one("SELECT nextval('version')");
+      console.log("version", version)
       let lastMutationID = parseInt(
         (
           await db.oneOrNone(
@@ -62,6 +64,9 @@ export default async (req, res) => {
           case 'createPin':
             await createPin(db, mutation.args, version);
             break;
+          case 'deletePin':
+            await deletePin(db, mutation.args, version);
+            break;
           default:
             throw new Error(`Unknown mutation: ${mutation.name}`);
         }
@@ -85,26 +90,37 @@ export default async (req, res) => {
       );
       res.send('ok');
 
-
     })
   } catch (e) {
     console.error(" [push error] >>", e);
     res.status(500).send(e.toString());
   } finally {
-    console.log(' [push] >> Processed push in', Date.now() - t0);
+    // console.log(' [push] >> Processed push in', Date.now() - t0);
   }
 
 }
 
+async function createPin(db, {id, sender, text, description, ord, lat, lng, created_at, updated_at}, version) {
+  try {
+    const { data, error } = await supabase
+      .from('pin')
+      .insert({ id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
+    console.log("data", data)
+  } catch (error) {
+    console.log("error", error)
+  }
+}
 
+async function deletePin(db, {id}, version) {
+  let pinId = id.replace("pin/", "")
+  const { data, error } = await supabase
+    .from('pin')
+    .delete()
+    .match({ id: pinId })
+}
 
-async function createPin(db, {id, sender, text, description, ord, lat, lng}, version) {
-  await db.none(
-    `INSERT INTO pin (
-    id, sender, text, description, lat, lng, ord, version) values
-    ($1, $2, $3, $4, $5, $6, $7, $8)`,
-    [id, sender, text, description, lat, lng, ord, version],
-  );
+async function clearPins() {
+
 }
 
 async function sendPoke() {

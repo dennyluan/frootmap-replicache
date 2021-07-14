@@ -1,10 +1,9 @@
-import React, { useEffect, useState, MouseEvent, useRef, createContext } from "react";
+import React, { useEffect, useState, MouseEvent, useRef } from "react";
 import { useSelector, useDispatch, connect, Provider } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
-import useSupercluster from 'use-supercluster';
 
 import PinFormModal from "../components/PinFormModal";
-import Header from "../components/Header";
+import Navigation from "../components/Navigation";
 import PinModal from "../components/PinModal";
 import Map from "../components/Map";
 import { ICoords, IPin, IPoint, JSONValue } from "../models/types";
@@ -16,6 +15,9 @@ import store from "./../utils/store";
 import { Replicache, MutatorDefs } from 'replicache';
 import { useSubscribe } from 'replicache-react-util';
 import * as Pusher from 'pusher-js';
+import { listen } from './../utils/rep';
+import { mutators } from './../features/mutators'
+
 
 import dynamic from 'next/dynamic';
 const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
@@ -23,7 +25,8 @@ const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 function App(props: any) {
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
-  const [ viewCoords, setViewCoords ] = useState<ICoords>({ lat: 21.284084348268202, lng: -157.7855795839304 });
+  const [ vespaCoords, setVespaCoords ] = useState<ICoords>();
+  const [ selectedViewCoords, setSelectedViewCoords ] = useState<ICoords>({ lat: 0, lng: 0 });
   const { isShown, togglePinFormModal, modalPinCoords } = useFormModal();
   const { activePin, togglePinModal } = usePinModal();
   const { map } = useSelector( ( state: { map: any } ) => state.map );
@@ -32,77 +35,37 @@ function App(props: any) {
   const [zoom, setZoom] = useState<number>(16);
   const [rep, setRep] = useState<Replicache<MutatorDefs>>();
 
-  const [ data, setData ] = useState<any>();
-
-  let allPoints : IPoint[] = []
-
-
-  // useSubscribe(rep, f, def)
-  // const thing = useSubscribe(
-  //   rep,
-  //   async tx => {
-  //     const thepins = await tx.scan({prefix: 'pin/'}).entries().toArray();
-  //     thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
-  //     return thepins;
-  //   },
-  //   [],
-  // );
-
-
-  // console.log("props.pins", props.pins)
-  if (props.pins && props.pins.length > 0) {
-    allPoints = props.pins.map( (pin : IPin) => ({
-      "type": "Feature",
-      "properties": {
-        "cluster": false,
-        "pinId": pin.id,
-        "text": pin.text
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          pin.coords.lng,
-          pin.coords.lat
-        ]
-        // "coordinates": {
-        //   "lng": pin.coords.lng,
-        //   "lat": pin.coords.lat
-        // }
-      }
-    }))
-  }
-
-  const { clusters, supercluster } = useSupercluster({
-    points: allPoints,
-    bounds,
-    zoom,
-    options: {
-      radius: 75,
-      maxZoom: 20
-    }
-  })
-
-
   useEffect(() => {
     // set the map location from browser
     if (navigator.geolocation != undefined) {
       navigator.geolocation.getCurrentPosition(
         (position: {coords:{latitude: number, longitude: number}}) => {
-          setViewCoords({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
+          setVespaCoords({lat: position.coords.latitude,lng: position.coords.longitude});
         },
         () => {
+          // console.log("no geo")
         }
       );
     }
-
-    // dispatch(loadPins())
-    props.loadPins()
   }, []);
 
-  // console.log("rep", rep)
+  useEffect(()=> {
+    const isProd = location.host.indexOf("fruit.camera") > -1;
+    const repConfig = {
+      key: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_KEY,
+      cluster: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_CLUSTER
+    }
+    const rep = new Replicache<MutatorDefs>({
+      pushURL: '/api/supa-push',
+      pullURL: '/api/supa-pull',
+      wasmModule: isProd ? "/replicache.wasm" : "/replicache.dev.wasm",
+      name: "fruit",
+      mutators
+    });
+    listen(rep, repConfig);
+    setRep(rep);
+  }, [])
+
 
   return (
     <div className="App">
@@ -110,23 +73,26 @@ function App(props: any) {
       {/*
         this order matters :(
       */}
-      <RepContainerDynamic setRep={setRep}/>
+
+      {/*
+        <RepContainerDynamic setRep={setRep} rep={rep}/>
+      */}
       {rep &&
 
         <div className="body">
-            <Header
-              rep={rep}
-            />
+            <Navigation rep={rep} />
 
             <Map
               isShown={isShown}
               map={map}
               mapRef={mapRef}
               setZoom={setZoom}
+              zoom={zoom}
+              setSelectedViewCoords={setSelectedViewCoords}
+              selectedViewCoords={selectedViewCoords}
+              vespaCoords={vespaCoords}
               setBounds={setBounds}
-              clusters={clusters}
-              supercluster={supercluster}
-              allPoints={allPoints}
+              bounds={bounds}
               togglePinFormModal={togglePinFormModal}
               togglePinModal={togglePinModal}
               rep={rep}
@@ -136,14 +102,18 @@ function App(props: any) {
               isShown={isShown}
               modalPinCoords={modalPinCoords}
               togglePinFormModal={togglePinFormModal}
+              setSelectedViewCoords={setSelectedViewCoords}
               clearPins={props.clearPins}
               mapRef={mapRef.current}
               rep={rep}
             />
 
             <PinModal
+              rep={rep}
               pin={activePin}
+              setSelectedViewCoords={setSelectedViewCoords}
               togglePinModal={togglePinModal}
+              togglePinFormModal={togglePinFormModal}
             />
 
         </div>
@@ -167,6 +137,5 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(App)
-
 
 

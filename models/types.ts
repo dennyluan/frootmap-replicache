@@ -10,6 +10,9 @@ export interface IPin {
   id: string,
   text: string,
   public?: boolean,
+  created_at: string,
+  updated_at: string,
+  description: string,
   coords: ICoords
 }
 

@@ -1,6 +1,6 @@
 import Pusher from 'pusher';
 
-import {getDB} from './db';
+import {getDB} from '../../db';
 
 export default async (req, res) => {
   const push = req.body;

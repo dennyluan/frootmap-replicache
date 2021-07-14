@@ -11,8 +11,7 @@ export const mutators = {
     lat: number,
     lng: number,
   } ) {
-    console.log("hello there!", args)
-    console.log("sender!", args['sender'])
+    console.log("createPin args:", args)
     await tx.put(`pin/${args['id']}`, {
       args
       // args,
@@ -23,6 +22,13 @@ export const mutators = {
       // lng
     });
 
+  },
+
+  async deletePin(tx: WriteTransaction, args: {
+    id: string,
+  }) {
+    console.log('delelting', args)
+    await tx.del(`pin/${args['id']}`)
   },
 
   // async ...
