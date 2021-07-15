@@ -1,6 +1,22 @@
-const withPWA = require('next-pwa')
+// const withPWA = require('next-pwa')
 
-module.exports = withPWA({
+// module.exports = withPWA({
+//   future: {
+//     webpack5: true
+//   },
+//   webpack: (config, options) => {
+//     config.experiments = {
+//       topLevelAwait: true,
+//     };
+//     return config;
+//   },
+//   pwa: {
+//     dest: 'public',
+//     disable: true
+//   }
+// });
+
+module.exports = {
   future: {
     webpack5: true
   },
@@ -10,8 +26,4 @@ module.exports = withPWA({
     };
     return config;
   },
-  pwa: {
-    dest: 'public',
-    disable: true
-  }
-});
+};
