@@ -18,8 +18,8 @@ import * as Pusher from 'pusher-js';
 import { listen } from './../utils/rep';
 import { mutators } from './../features/mutators'
 
-import dynamic from 'next/dynamic';
-const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
+// import dynamic from 'next/dynamic';
+// const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
 function App(props: any) {
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
