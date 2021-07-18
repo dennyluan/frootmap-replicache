@@ -18,7 +18,6 @@ import * as Pusher from 'pusher-js';
 import { listen } from './../utils/rep';
 import { mutators } from './../features/mutators'
 
-
 import dynamic from 'next/dynamic';
 const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
@@ -35,8 +34,7 @@ function App(props: any) {
   const [zoom, setZoom] = useState<number>(16);
   const [rep, setRep] = useState<Replicache<MutatorDefs>>();
 
-  useEffect(() => {
-    // set the map location from browser
+  function setupGeo(){
     if (navigator.geolocation != undefined) {
       navigator.geolocation.getCurrentPosition(
         (position: {coords:{latitude: number, longitude: number}}) => {
@@ -47,22 +45,22 @@ function App(props: any) {
         }
       );
     }
-  }, []);
+  }
 
   useEffect(()=> {
+    setupGeo()
+
     const isProd = location.host.indexOf("fruit.camera") > -1;
-    const repConfig = {
-      key: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_KEY,
-      cluster: process.env.NEXT_PUBLIC_REPLICHAT_PUSHER_CLUSTER
-    }
+
     const rep = new Replicache<MutatorDefs>({
-      pushURL: '/api/supa-push',
-      pullURL: '/api/supa-pull',
+      pushURL: '/api/push',
+      pullURL: '/api/pull',
       wasmModule: isProd ? "/replicache.wasm" : "/replicache.dev.wasm",
       name: "fruit",
       mutators
     });
-    listen(rep, repConfig);
+
+    listen(rep);
     setRep(rep);
   }, [])
 
@@ -70,13 +68,6 @@ function App(props: any) {
   return (
     <div className="App">
 
-      {/*
-        this order matters :(
-      */}
-
-      {/*
-        <RepContainerDynamic setRep={setRep} rep={rep}/>
-      */}
       {rep &&
 
         <div className="body">
@@ -104,16 +95,15 @@ function App(props: any) {
               togglePinFormModal={togglePinFormModal}
               setSelectedViewCoords={setSelectedViewCoords}
               clearPins={props.clearPins}
-              mapRef={mapRef.current}
               rep={rep}
             />
 
             <PinModal
-              rep={rep}
               pin={activePin}
               setSelectedViewCoords={setSelectedViewCoords}
               togglePinModal={togglePinModal}
               togglePinFormModal={togglePinFormModal}
+              rep={rep}
             />
 
         </div>

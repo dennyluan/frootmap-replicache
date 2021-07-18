@@ -24,7 +24,6 @@
     "google-map-react": "^2.1.9",
     "graceful-fs": "^4.2.6",
     "next": "10.2.3",
-    "next-pwa": "^5.2.23",
     "pg-promise": "^10.10.2",
     "pusher": "^5.0.0",
     "pusher-js": "^7.0.3",

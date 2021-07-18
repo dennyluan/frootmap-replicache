@@ -19,7 +19,6 @@ Modal.setAppElement("#root");
 interface IPinModalProps {
   isShown: boolean,
   modalPinCoords: ICoords,
-  mapRef: any,
   togglePinFormModal: () => void,
   setSelectedViewCoords: (coords: ICoords) => void,
   clearPins: () => void,
@@ -118,6 +117,8 @@ const PinFormModal = (props: IPinModalProps) => {
     let {lat, lng} = props.modalPinCoords
     let value = fruit || titleInput || null
 
+    const time = new Date().toISOString()
+
     const newpayload = {
       id: id,
       sender: "Denny",
@@ -125,10 +126,12 @@ const PinFormModal = (props: IPinModalProps) => {
       ord: order,
       text: value,
       lat: lat,
-      lng: lng
+      lng: lng,
+      created_at: time,
+      updated_at: time
     }
 
-    console.log("payload", newpayload)
+    console.log("[pinformmodal] payload", newpayload)
 
     props.rep.mutate.createPin({...newpayload});
   }

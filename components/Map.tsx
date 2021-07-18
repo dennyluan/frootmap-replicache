@@ -12,6 +12,8 @@ import { useSubscribe } from 'replicache-react-util';
 
 import useSupercluster from 'use-supercluster';
 
+import { deserialize } from './../features/serializer'
+
 
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -57,34 +59,14 @@ const Map = (props: MapProps) => {
     async tx => {
       const data : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
 
-      console.log("data", data)
-
-      // ## serializer
-      // todo: turn pin into ipin first? then remove any into IPin
-      return data.map( (pin: any ) => ({
-        "type": "Feature",
-        "properties": {
-          "cluster": false,
-          "pinId": pin[1].id,
-          "created_at": pin[1].created_at,
-          "updated_at": pin[1].updated_at,
-          "description": pin[1].description,
-          "text": pin[1].text,
-        },
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            pin[1].lng,
-            pin[1].lat
-          ]
-        }
-      }))
-
+      console.log("[map.tsx] pins subscription data", data)
+      const pins = deserialize(data)
+      console.log("[map.tsx] <<rep pins>>", pins)
+      return pins
     },
     [],
   );
 
-  console.log("<<rep pins>>", pins)
 
   const { clusters, supercluster } : { clusters: any, supercluster: any } = useSupercluster({
     points: pins,
@@ -230,8 +212,8 @@ const Map = (props: MapProps) => {
         ])
       }}
     >
-      <Vespa vespaCoords={props.vespaCoords} />
-      {renderSelectedViewPin()}
+      {/*<Vespa vespaCoords={props.vespaCoords} />*/}
+      {/*{renderSelectedViewPin()}*/}
       {renderMarkers()}
     </GoogleMapReact>
   )

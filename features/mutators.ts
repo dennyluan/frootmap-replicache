@@ -10,16 +10,12 @@ export const mutators = {
     ord: number,
     lat: number,
     lng: number,
+    created_at: string,
+    updated_at: string,
   } ) {
-    console.log("createPin args:", args)
+    console.log("[createPin] args:", args)
     await tx.put(`pin/${args['id']}`, {
       args
-      // args,
-      // text,
-      // description,
-      // ord,
-      // lat,
-      // lng
     });
 
   },
@@ -27,18 +23,9 @@ export const mutators = {
   async deletePin(tx: WriteTransaction, args: {
     id: string,
   }) {
-    console.log('delelting', args)
-    await tx.del(`pin/${args['id']}`)
+    console.log('[deletePin] pin id:', args['id'])
+    const del = await tx.del(`pin/${args['id']}`)
   },
 
   // async ...
 }
-
-
-// async createMessage(tx, {id, from, content, order}) {
-//  await tx.put(`message/${id}`, {
-//    from,
-//    content,
-//    order,
-//  });
-// },
