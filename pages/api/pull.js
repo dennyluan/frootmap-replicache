@@ -70,7 +70,7 @@ export default async (req, res) => {
     console.error(e);
     res.status(500).send(e.toString());
   } finally {
-    // console.log('[pull] >>>> Processed pull in', Date.now() - t0);
+    console.log('[pull] >>>> Processed pull in', Date.now() - t0);
   }
 
 }

@@ -212,8 +212,15 @@ const Map = (props: MapProps) => {
         ])
       }}
     >
-      {/*<Vespa vespaCoords={props.vespaCoords} />*/}
-      {/*{renderSelectedViewPin()}*/}
+      {props.vespaCoords &&
+        <Vespa
+          lat={props.vespaCoords.lat}
+          lng={props.vespaCoords.lng}
+          vespaCoords={props.vespaCoords}
+        />
+      }
+
+      {renderSelectedViewPin()}
       {renderMarkers()}
     </GoogleMapReact>
   )

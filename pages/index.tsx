@@ -33,21 +33,24 @@ function App(props: any) {
   const [zoom, setZoom] = useState<number>(16);
   const [rep, setRep] = useState<Replicache<MutatorDefs>>();
 
-  function setupGeo(){
+
+
+  useEffect(()=> {
     if (navigator.geolocation != undefined) {
       navigator.geolocation.getCurrentPosition(
         (position: {coords:{latitude: number, longitude: number}}) => {
           setVespaCoords({lat: position.coords.latitude,lng: position.coords.longitude});
         },
         () => {
-          // console.log("no geo")
+          console.log("no geo")
         }
       );
     }
-  }
+  }, [])
+          console.log('coords', vespaCoords)
 
   useEffect(()=> {
-    setupGeo()
+    // setupGeo()
 
     const isProd = location.host.indexOf("fruit.camera") > -1;
 
