@@ -13,7 +13,6 @@ import { loadPins, clearPins, selectPins } from '../features/pinSlice'
 import store from "./../utils/store";
 
 import { Replicache, MutatorDefs } from 'replicache';
-import { useSubscribe } from 'replicache-react-util';
 import * as Pusher from 'pusher-js';
 import { listen } from './../utils/rep';
 import { mutators } from './../features/mutators'

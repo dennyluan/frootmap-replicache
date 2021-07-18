@@ -8,7 +8,7 @@ import ClusterMarker from "../components/ClusterMarker";
 import Vespa from "../components/Vespa";
 
 import { Replicache, MutatorDefs } from 'replicache';
-import { useSubscribe } from 'replicache-react-util';
+import { useSubscribe } from 'replicache-react';
 
 import useSupercluster from 'use-supercluster';
 

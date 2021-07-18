@@ -1959,7 +1959,7 @@ ms@2.0.0:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
 
-nanoid@^3.1.22:
+nanoid@^3.1.22, nanoid@^3.1.23:
   version "3.1.23"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.23.tgz#f744086ce7c2bc47ee0a8472574d5c78e4183a81"
   integrity sha512-FiB0kzdP0FFVGDKlRLEQ1BgDzU87dy5NnzjeW9YZNt+/c3+q82EQDUwniSAUxp/F0gFNI1ZhKU1FqYsMuqZVnw==
@@ -2550,7 +2550,7 @@ react-transition-group@^4.4.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@17.0.2, "react@>=16.0 <18.0":
+react@17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
   integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
@@ -2612,18 +2612,15 @@ regenerator-runtime@^0.13.4:
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.7.tgz#cac2dacc8a1ea675feaabaeb8ae833898ae46f55"
   integrity sha512-a54FxoJDIr27pgf7IgeQGxmqUNYrcV338lf/6gH456HZ/PhX+5BcwHXG9ajESmwe6WRO0tAzRUrRmNONWgkrew==
 
-replicache-react-util@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/replicache-react-util/-/replicache-react-util-2.2.0.tgz#64431adfdb70b00790a16bf1ee556f71a6f4790b"
-  integrity sha512-LLRFm+sj6XjIQawmAtiQjSFkIfEak6dle0jf4F4b/XgNxL/5Tf/R4f7uga8Vkcyb89CscLA6gK/M2bQPM11z0g==
-  dependencies:
-    react ">=16.0 <18.0"
-    replicache ">=6.0.1 <7.0"
+replicache-react@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/replicache-react/-/replicache-react-1.0.0.tgz#33f8483efd1671b758c60ab7e83243ed45641101"
+  integrity sha512-ytQSf2bjBjxPlr5RYdzikrctZJxAMW0ojyRoU8PQw/UNaio1qS4of1x/KLCT9zXfAguLJN7c5B/ERPCLyKwpnw==
 
-"replicache@>=6.0.1 <7.0", replicache@^6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/replicache/-/replicache-6.2.2.tgz#ce3de9ca8f9970c2e522ad68f4d58f55728594b6"
-  integrity sha512-qXU2MDe7rpZ5qpPAnhQvZ/dwApWd94Wx8OBkGmzhmreP0a9aCtykeIUk34zXr3hcTCH4KiEIjfPkdpiJqMLvzQ==
+replicache@^6.3.2:
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/replicache/-/replicache-6.3.2.tgz#e66a056117c90f81d81eae070c0eb5b87b8f169a"
+  integrity sha512-qWtGwRyXYdJdvbScDx4fLYiR9Tykmyxvw2UkT5QSqXrlI8nMJTsiGGTTXNIgCtjIFj4JT9JskxPu7uRKdHS37w==
 
 reselect@^4.0.0:
   version "4.0.0"

@@ -5,40 +5,11 @@ import NavDropdown from 'react-bootstrap/NavDropdown'
 
 import * as Pusher from 'pusher-js';
 import { Replicache } from 'replicache';
-import { useSubscribe } from 'replicache-react-util';
 
 import { useSwipeable } from "react-swipeable";
 
 
 export default function Navigation(props) {
-
-  // let pins
-  // const pins = useSubscribe(
-  //   props.rep,
-  //   async tx => {
-  //     // Note: Replicache also supports secondary indexes, which can be used
-  //     // with scan. See:
-  //     // https://js.replicachedev/classes/replicache.html#createindex
-  //     const list = await tx.scan({prefix: 'pin/'}).entries().toArray();
-  //     list.sort(([, {order: a}], [, {order: b}]) => a - b);
-  //     return list;
-  //   },
-  //   [],
-  // );
-
-  const pins = useSubscribe(
-    props.rep,
-    async tx => {
-      const thepins = await tx.scan({prefix: 'pins/'}).entries().toArray();
-      thepins.sort(([, {order: a}], [, {order: b}]) => a - b);
-      return thepins;
-    },
-    [],
-  );
-
-
-  // console.log('header rep pins', pins)
-
   function handleClick(){
     return null
   }
@@ -46,10 +17,6 @@ export default function Navigation(props) {
   return (
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
-
-      {pins.map( (p) => {
-        return <p>pin: {p.id}</p>
-      })}
 
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">

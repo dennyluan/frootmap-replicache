@@ -26,56 +26,7 @@ export default async (req, res) => {
 
       let lastMutationID = await getLastMutationID(t, push.clientID);
 
-      // let lastMutationID = parseInt(
-      //   (
-      //     await db.oneOrNone(
-      //       'SELECT last_mutation_id FROM replicache_client WHERE id = $1',
-      //       push.clientID,
-      //     )
-      //   )?.last_mutation_id ?? '0',
-      // );
-      // if (!lastMutationID) {
-      //   await db.none(
-      //     'INSERT INTO replicache_client (id, last_mutation_id) VALUES ($1, $2)',
-      //     [push.clientID, lastMutationID],
-      //   );
-      // }
-
       console.log('[push] version', version, 'lastMutationID:', lastMutationID);
-
-      // for (let i = 0; i < push.mutations.length; i++) {
-      //   const t1 = Date.now();
-
-      //   const mutation = push.mutations[i];
-      //   const expectedMutationID = lastMutationID + 1;
-
-      //   if (mutation.id < expectedMutationID) {
-      //     console.log(
-      //       `!!! Mutation ${mutation.id} has already been processed - skipping`,
-      //     );
-      //     continue;
-      //   }
-      //   if (mutation.id > expectedMutationID) {
-      //     console.warn(`!!! Mutation ${mutation.id} is from the future - aborting`);
-      //     break;
-      //   }
-
-      //   // console.log('[push] Processing mutation:', JSON.stringify(mutation, null, ''));
-
-      //   switch (mutation.name) {
-      //     case 'createPin':
-      //       await createPin(db, mutation.args, version);
-      //       break;
-      //     case 'deletePin':
-      //       await deletePin(db, mutation.args, version);
-      //       break;
-      //     default:
-      //       throw new Error(`Unknown mutation: ${mutation.name}`);
-      //   }
-
-      //   lastMutationID = expectedMutationID;
-      //   console.log('Processed mutation in', Date.now() - t1);
-      // }
 
       for (const mutation of push.mutations) {
         const t1 = Date.now();
@@ -113,10 +64,7 @@ export default async (req, res) => {
       await sendPoke();
 
       console.log(
-        'setting',
-        push.clientID,
-        'last_mutation_id to',
-        lastMutationID,
+        'setting', push.clientID, 'last_mutation_id to', lastMutationID
       );
 
       await t.none(

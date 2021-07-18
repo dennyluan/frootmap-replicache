@@ -11,7 +11,7 @@ import { ICoords } from "../models/types";
 import { createPin } from "../features/pinSlice";
 import { setMap } from "../features/mapSlice";
 
-import { useSubscribe } from 'replicache-react-util';
+import { useSubscribe } from 'replicache-react';
 import { Replicache, MutatorDefs } from 'replicache';
 
 Modal.setAppElement("#root");
