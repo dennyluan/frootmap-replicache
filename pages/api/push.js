@@ -58,7 +58,7 @@ export default async (req, res) => {
         }
 
         lastMutationID = expectedMutationID;
-        console.log('Processed mutation in', Date.now() - t1);
+        console.log('[push] Processed mutation in', Date.now() - t1);
       }
 
       await sendPoke();
@@ -74,8 +74,6 @@ export default async (req, res) => {
       res.send('{}');
 
       console.log("\n[push] RES:", res.statusCode)
-      // console.log("\n\n\n\n\n\n")
-
     })
   } catch (e) {
     console.error("\n\n\n[push error] >>\n\n", e);
@@ -89,15 +87,13 @@ export default async (req, res) => {
 
 async function createPin(db, {id, sender, text, description, ord, lat, lng, created_at, updated_at}, version) {
   try {
-    console.log("[data] createpin payload:", { id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
+    console.log("[push] createpin payload:", { id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
     const { data, error } = await supabase
       .from('pin')
       .insert({ id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
-    console.log("data", data)
 
-    console.log("!!!####\n\n in try error", error)
   } catch (error) {
-    console.log("!!!####\n\n catch error", error)
+    console.log("!!!#### push error", error)
   }
 }
 

@@ -10,7 +10,7 @@
 // }
 
 // // todo: form props
-// const RepContainer = (props: any) => {
+const RepContainer = (props: any) => {
 
 //   useEffect(()=> {
 //     const isProd = location.host.indexOf("fruit.camera") > -1;
@@ -30,6 +30,6 @@
 //   },[])
 
 //   return null
-// }
+}
 
-// export default RepContainer
+export default RepContainer

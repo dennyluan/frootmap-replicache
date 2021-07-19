@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import GoogleMapReact from "google-map-react";
 import { ICoords, IPin, IPoint } from "../models/types";
-import {PointFeature, ClusterProperties, AnyProps, ClusterFeature} from 'supercluster';
+import { PointFeature, ClusterProperties, AnyProps, ClusterFeature } from 'supercluster';
 
 import PinMarker from "./../components/PinMarker";
 import ClusterMarker from "../components/ClusterMarker";
 import Vespa from "../components/Vespa";
+import PendingPinMarker from "../components/PendingPinMarker"
 
 import { Replicache, MutatorDefs } from 'replicache';
 import { useSubscribe } from 'replicache-react';
 
 import useSupercluster from 'use-supercluster';
 
-import { deserialize } from './../features/serializer'
-
+import { deserialize, deserializeFromCluster } from './../features/serializer'
 
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -61,7 +61,6 @@ const Map = (props: MapProps) => {
 
       console.log("[map.tsx] pins subscription data", data)
       const pins = deserialize(data)
-      console.log("[map.tsx] <<rep pins>>", pins)
       return pins
     },
     [],
@@ -122,14 +121,10 @@ const Map = (props: MapProps) => {
     if (props.zoom > 16) {
       // vertOffset = -0.005;
     }
-    return <div
-      className="view-marker"
+    return <PendingPinMarker
       lat={(props.selectedViewCoords.lat + vertOffset)}
       lng={props.selectedViewCoords.lng}
-    >
-      <div className="arrow"></div>
-      New Pin!
-    </div>
+    />
   }
 
   function renderMarkers() {
@@ -165,18 +160,7 @@ const Map = (props: MapProps) => {
 
       } else {
 
-        // reserializing for the pin marker
-        const pin : IPin = {
-          id: cluster.properties.pinId,
-          text: cluster.properties.text,
-          created_at: cluster.properties.created_at,
-          updated_at: cluster.properties.updated_at,
-          description: cluster.properties.description,
-          coords: {
-            lat: cluster.properties[0],
-            lng: cluster.properties[1]
-          }
-        }
+        const pin : IPin = deserializeFromCluster(cluster)
 
         return <PinMarker
           key={index}
@@ -216,7 +200,6 @@ const Map = (props: MapProps) => {
         <Vespa
           lat={props.vespaCoords.lat}
           lng={props.vespaCoords.lng}
-          vespaCoords={props.vespaCoords}
         />
       }
 

@@ -6,10 +6,9 @@ import PinFormModal from "../components/PinFormModal";
 import Navigation from "../components/Navigation";
 import PinModal from "../components/PinModal";
 import Map from "../components/Map";
-import { ICoords, IPin, IPoint, JSONValue } from "../models/types";
+import { ICoords, IPin } from "../models/types";
 import { useFormModal, usePinModal } from "../utils/useModal";
 
-import { loadPins, clearPins, selectPins } from '../features/pinSlice'
 import store from "./../utils/store";
 
 import { Replicache, MutatorDefs } from 'replicache';
@@ -33,9 +32,7 @@ function App(props: any) {
   const [zoom, setZoom] = useState<number>(16);
   const [rep, setRep] = useState<Replicache<MutatorDefs>>();
 
-
-
-  useEffect(()=> {
+  function setupGeo(){
     if (navigator.geolocation != undefined) {
       navigator.geolocation.getCurrentPosition(
         (position: {coords:{latitude: number, longitude: number}}) => {
@@ -46,11 +43,10 @@ function App(props: any) {
         }
       );
     }
-  }, [])
-          console.log('coords', vespaCoords)
+  }
 
   useEffect(()=> {
-    // setupGeo()
+    setupGeo()
 
     const isProd = location.host.indexOf("fruit.camera") > -1;
 
@@ -114,20 +110,7 @@ function App(props: any) {
   );
 }
 
-const mapStateToPropsSelector = createSelector(
-  ( state: {pins: IPin[]} ) => state.pins,
-  pins => pins
-)
 
-const mapStateToProps = (state: any) => ({
-  pins: mapStateToPropsSelector(state)
-})
-
-const mapDispatchToProps = { loadPins, clearPins }
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App)
+export default connect()(App)
 
 

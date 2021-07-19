@@ -8,7 +8,6 @@ import { useDispatch } from "react-redux";
 import { useSwipeable } from "react-swipeable";
 
 import { ICoords } from "../models/types";
-import { createPin } from "../features/pinSlice";
 import { setMap } from "../features/mapSlice";
 
 import { useSubscribe } from 'replicache-react';
@@ -144,22 +143,6 @@ const PinFormModal = (props: IPinModalProps) => {
         pinCoords: props.modalPinCoords,
         text: value
       }
-
-      // 1. await upload photo first
-      // 2. then repCreatePin(payload)
-
-      // async function uploadPhoto()
-      //   if resp.ok { payload.photoUrl = ""; repCreatePin(payload)
-      //   } else {
-      //     throw new Error("upload failed")
-      //   }
-      // }
-
-      // uploadPhoto().catch( e => {})
-
-
-      // todo: move rep to redux state?
-      // dispatch(createPin(payload))
 
       repCreatePin(payload)
 

@@ -1,4 +1,5 @@
 import { ICoords, IPin, IPoint } from "../models/types";
+import { ClusterFeature } from 'supercluster';
 
 // todo: turn pin into ipin first? then remove any into IPin
 export function deserialize(data: any) {
@@ -20,4 +21,19 @@ export function deserialize(data: any) {
       ]
     }
   }))
+}
+
+export function deserializeFromCluster(cluster: ClusterFeature<any>) {
+  const pin : IPin = {
+    id: cluster.properties.pinId,
+    text: cluster.properties.text,
+    created_at: cluster.properties.created_at,
+    updated_at: cluster.properties.updated_at,
+    description: cluster.properties.description,
+    coords: {
+      lat: cluster.properties[0],
+      lng: cluster.properties[1]
+    }
+  }
+  return pin
 }

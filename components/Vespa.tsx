@@ -2,17 +2,14 @@ import React from "react";
 import { ICoords } from "../models/types";
 
 interface VespaProps {
-  // vespaCoords?: ICoords
+  lat?: any
+  lng?: any
 }
 
 const Vespa = (props: VespaProps) => {
-  if (props.vespaCoords == undefined) return null
-
   return (
-    <div
-      className="vespa"
-    >
-      <img src="/vespa.svg" />
+    <div className="vespa">
+      <img src="/vespa.svg" alt="current location" />
     </div>
   )
 }

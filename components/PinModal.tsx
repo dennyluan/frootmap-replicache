@@ -8,7 +8,6 @@ import { useSwipeable } from "react-swipeable";
 
 import { IPin, ICoords } from "../models/types"
 
-import { deletePin } from '../features/pinSlice'
 import { Replicache, MutatorDefs } from 'replicache';
 
 Modal.setAppElement("#root");
