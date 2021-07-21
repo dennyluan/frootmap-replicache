@@ -1,6 +1,5 @@
 import {db} from '../../db.js';
 import Pusher from 'pusher';
-// import { createClient } from '@supabase/supabase-js'
 import { supabase } from '../../utils/supabase';
 
 // |pins|

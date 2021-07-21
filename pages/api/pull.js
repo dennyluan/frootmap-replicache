@@ -1,19 +1,9 @@
 import {db} from '../../db.js';
 import { createClient } from '@supabase/supabase-js'
 
-
-const pinsToPGParams = (pins) => ({
-  rawType: true,
-  toPostgres: () =>
-    pins
-      .map(({ id, updated_at }) => db.as.format('($1, $2)', [id, updated_at]))
-      .join(),
-})
-
 export default async (req, res) => {
-
-  const pull = req.body;
   console.log("\n\n\n")
+  const pull = req.body;
   console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
   const t0 = Date.now();
 
@@ -48,34 +38,24 @@ export default async (req, res) => {
         });
       }
 
-      let deleted
-      console.log(">>>>> resp", pull)
-      console.log("thing", pinsToPGParams(pull.cookie.pins))
+      // push all pending changes as patches
+      // todo: deserialize data here
+      patch.push(...changed.map(row => ({
+        op: 'put',
+        key: `pin/${row.id}`,
+        value: {
+          from: row.sender,
+          text: row.text,
+          lat: row.lat,
+          lng: row.lng,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          description: row.description,
+          order: parseInt(row.ord),
+          id: row.id,
+        },
+      })));
 
-      if (deleted) {
-
-
-
-      } else {
-        // push all pending changes as patches
-        // todo: deserialize data here
-        patch.push(...changed.map(row => ({
-          op: 'put',
-          key: `pin/${row.id}`,
-          value: {
-            from: row.sender,
-            text: row.text,
-            lat: row.lat,
-            lng: row.lng,
-            created_at: row.created_at,
-            updated_at: row.updated_at,
-            description: row.description,
-            order: parseInt(row.ord),
-            id: row.id,
-          },
-        })));
-
-      }
 
       res.json({
         lastMutationID,
@@ -93,5 +73,4 @@ export default async (req, res) => {
   } finally {
     console.log('[pull] >>>> Processed pull in', Date.now() - t0);
   }
-
 }

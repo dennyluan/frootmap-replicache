@@ -66,8 +66,13 @@ const Map = (props: MapProps) => {
     [],
   );
 
-
-  const { clusters, supercluster } : { clusters: any, supercluster: any } = useSupercluster({
+  const {
+    clusters,
+    supercluster
+  } : {
+    clusters: any,
+    supercluster: any
+  } = useSupercluster({
     points: pins,
     bounds: props.bounds,
     zoom: props.zoom,
@@ -128,11 +133,9 @@ const Map = (props: MapProps) => {
   }
 
   function renderMarkers() {
-    // if (props.clusters == []) return
     if (clusters == []) return
 
     // todo: fix any
-    // return props.clusters.map( (cluster: ClusterFeature<any>, index) => {
     return clusters.map( (cluster: ClusterFeature<any>, index: number) => {
       const [lng, lat] = cluster.geometry.coordinates;
       const {
@@ -176,36 +179,51 @@ const Map = (props: MapProps) => {
     })
   }
 
-  return (
-    <GoogleMapReact
-      yesIWantToUseGoogleMapApiInternals
-      bootstrapURLKeys={{ key: googleKey }}
-      center={props.map.center}
-      zoom={props.map.zoom}
-      onClick={handleMapClick}
-      onGoogleApiLoaded={({map}) => {
-        props.mapRef.current = map;
-      }}
-      onChange={ ( { zoom , bounds } ) => {
-        props.setZoom(zoom)
-        props.setBounds([
-          bounds.nw.lng,
-          bounds.se.lat,
-          bounds.se.lng,
-          bounds.nw.lat,
-        ])
-      }}
-    >
-      {props.vespaCoords &&
-        <Vespa
-          lat={props.vespaCoords.lat}
-          lng={props.vespaCoords.lng}
-        />
-      }
+  console.log(">> some pins", pins)
 
-      {renderSelectedViewPin()}
-      {renderMarkers()}
-    </GoogleMapReact>
+  return (
+    <div style={{ height: '100vh', width: '100%' }}>
+
+      {/*
+        <pre style={{
+          fontSize: '10px',
+          textAlign: 'left',
+          paddingTop: '60px'
+        }}>
+        {JSON.stringify(pins, "", 1)}
+        </pre>
+      */}
+
+      <GoogleMapReact
+        yesIWantToUseGoogleMapApiInternals
+        bootstrapURLKeys={{ key: googleKey }}
+        center={props.map.center}
+        zoom={props.map.zoom}
+        onClick={handleMapClick}
+        onGoogleApiLoaded={({map}) => {
+          props.mapRef.current = map;
+        }}
+        onChange={ ( { zoom , bounds } ) => {
+          props.setZoom(zoom)
+          props.setBounds([
+            bounds.nw.lng,
+            bounds.se.lat,
+            bounds.se.lng,
+            bounds.nw.lat,
+          ])
+        }}
+      >
+        {props.vespaCoords &&
+          <Vespa
+            lat={props.vespaCoords.lat}
+            lng={props.vespaCoords.lng}
+          />
+        }
+
+        {renderSelectedViewPin()}
+        {renderMarkers()}
+      </GoogleMapReact>
+    </div>
   )
 }
 

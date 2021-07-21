@@ -14,10 +14,7 @@ export const mutators = {
     updated_at: string,
   } ) {
     console.log("[createPin] args:", args)
-    await tx.put(`pin/${args['id']}`, {
-      args
-    });
-
+    await tx.put(`pin/${args['id']}`, args);
   },
 
   async deletePin(tx: WriteTransaction, args: {
