@@ -79,7 +79,7 @@ export default async (req, res) => {
     res.status(500).send(e.toString());
   } finally {
     console.log('[push] >> Processed push in', Date.now() - t0);
-      console.log("\n\n\n\n\n\n")
+    console.log("\n\n\n\n\n\n")
   }
 
 }
@@ -98,12 +98,16 @@ async function createPin(db, {id, sender, text, description, ord, lat, lng, crea
 
 async function deletePin(db, {id}, version) {
   let pinId = id.replace("pin/", "")
+  const time = new Date().toISOString()
   const { data, error } = await supabase
     .from('pin')
-    .delete()
+    .upsert({id: pinId, deleted_at: time})
     .match({ id: pinId })
+    // .then(resp => {
+    //   console.log("RESP", resp)
+    // })
   console.log("[deleting] data", data)
-  console.log("!!!####\n\n in try error", error)
+  console.log("!!!####\n\n [deleting] in try error", error)
 
 }
 

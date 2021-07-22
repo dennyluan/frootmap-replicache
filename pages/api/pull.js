@@ -1,5 +1,5 @@
 import {db} from '../../db.js';
-import { createClient } from '@supabase/supabase-js'
+import {supabase} from '../../utils/supabase.js';
 
 export default async (req, res) => {
   console.log("\n\n\n")
@@ -56,6 +56,24 @@ export default async (req, res) => {
         },
       })));
 
+
+      // delete
+
+      const deleted = await supabase
+        .from('pin')
+        .select('*')
+        .not("deleted_at", "is", null)
+        .then(resp => {
+          // console.log("deleted resp", resp)
+          return resp.body
+        })
+
+      deleted.forEach((pin) => {
+        patch.push({
+          op: 'del',
+          key: `pin/${pin.id}`,
+        })
+      })
 
       res.json({
         lastMutationID,

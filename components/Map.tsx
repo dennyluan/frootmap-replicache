@@ -46,7 +46,6 @@ interface MapProps {
   selectedViewCoords: ICoords,
   // clusters: (PointFeature<ClusterData> | PointFeature<ClusterProperties & AnyProps>)[],
   // allPoints: IPoint[] | [],
-  // supercluster: any
   rep: Replicache<MutatorDefs>
   vespaCoords?: ICoords,
 }
@@ -222,6 +221,7 @@ const Map = (props: MapProps) => {
 
         {renderSelectedViewPin()}
         {renderMarkers()}
+
       </GoogleMapReact>
     </div>
   )
