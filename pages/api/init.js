@@ -1,6 +1,6 @@
 import {db} from '../../db.js';
 
-import {supabase} from '../../utils/supabase.js';
+// import {supabase} from '../../utils/supabase.js';
 
 export default async (_, res) => {
   await db.task(async t => {
