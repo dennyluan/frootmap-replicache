@@ -4,7 +4,7 @@ import {supabase} from '../../utils/supabase.js';
 export default async (req, res) => {
   console.log("\n\n\n")
   const pull = req.body;
-  console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
+  // console.log(`[pull] Processing pull`, JSON.stringify(pull, null, ''));
   const t0 = Date.now();
 
   try {
@@ -28,7 +28,7 @@ export default async (req, res) => {
         await db.one('select max(version) as version from pin')
       ).version;
 
-      console.log("\n[pull]", {cookie, lastMutationID, changed});
+      // console.log("\n[pull]", {cookie, lastMutationID, changed});
 
       const patch = [];
 
@@ -58,13 +58,11 @@ export default async (req, res) => {
 
 
       // delete
-
       const deleted = await supabase
         .from('pin')
         .select('*')
         .not("deleted_at", "is", null)
         .then(resp => {
-          // console.log("deleted resp", resp)
           return resp.body
         })
 

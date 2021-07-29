@@ -8,8 +8,12 @@ import { Replicache } from 'replicache';
 
 import { useSwipeable } from "react-swipeable";
 
+import Avatar from './Avatar'
+
 
 export default function Navigation(props) {
+  const [avatar_url, setAvatarUrl] = useState(null)
+
   function handleClick(){
     return null
   }
@@ -17,7 +21,18 @@ export default function Navigation(props) {
   return (
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
+        <p>{avatar_url}</p>
 
+        <Avatar
+          url={avatar_url}
+          size={100}
+          onUpload={(url) => {
+            setAvatarUrl(url)
+            // updateProfile({ username, website, avatar_url: url })
+          }}
+        />
+
+        {props.children}
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">

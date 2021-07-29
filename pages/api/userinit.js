@@ -1,6 +1,5 @@
 import {db} from '../../db.js';
-import {supabase} from '../../utils/supabase.js';
-
+// import {supabase} from '../../utils/supabase.js';
 
 export default async (_, res) => {
   await db.task(async t => {
@@ -8,7 +7,6 @@ export default async (_, res) => {
     //   .storage
     //   .deleteBucket('avatars')
 
-    // console.log("suapbase>>> ", supabase)
     // console.log("data>>> ", data)
 
     await t.none('DROP TABLE IF EXISTS profiles');
@@ -33,13 +31,13 @@ export default async (_, res) => {
       on profiles for select
       using ( true )`)
 
-    await t.none(`create policy "Users can insert their own profile."
-      on profiles for insert
-      with check ( auth.uid() = id )`)
+    // await t.none(`create policy "Users can insert their own profile."
+    //   on profiles for insert
+    //   with check ( auth.uid() = id )`)
 
-    await t.none(`create policy "Users can update own profile."
-      on profiles for update
-      using ( auth.uid() = id );`)
+    // await t.none(`create policy "Users can update own profile."
+    //   on profiles for update
+    //   using ( auth.uid() = id );`)
 
     // -- Set up Realtime!
     await t.none(`begin;

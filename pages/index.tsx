@@ -16,11 +16,23 @@ import * as Pusher from 'pusher-js';
 import { listen } from './../utils/rep';
 import { mutators } from './../features/mutators'
 
+import { supabase } from '../utils/supabase'
+import Auth from '../components/Auth'
+import Account from '../components/Account'
+
 // import dynamic from 'next/dynamic';
 // const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
 function App(props: any) {
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+
+  const [session, setSession] = useState(null)
+  useEffect(() => {
+    setSession(supabase.auth.session())
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
 
   const [ vespaCoords, setVespaCoords ] = useState<ICoords>();
   const [ selectedViewCoords, setSelectedViewCoords ] = useState<ICoords>({ lat: 0, lng: 0 });
@@ -69,7 +81,9 @@ function App(props: any) {
       {rep &&
 
         <div className="body">
-            <Navigation rep={rep} />
+            <Navigation rep={rep}>
+              {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+            </Navigation>
 
             <Map
               isShown={isShown}

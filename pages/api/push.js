@@ -101,7 +101,7 @@ async function deletePin(db, {id}, version) {
   const time = new Date().toISOString()
   const { data, error } = await supabase
     .from('pin')
-    .upsert({id: pinId, deleted_at: time})
+    .upsert({ id: pinId, deleted_at: time })
     .match({ id: pinId })
     // .then(resp => {
     //   console.log("RESP", resp)
