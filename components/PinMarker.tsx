@@ -26,8 +26,8 @@ const PinMarker = ( props: PinMarkerProps ) => {
     >
       <div className="arrow"></div>
       <h2>{props.pin.text}</h2>
-      <h4 className="muted">{props.pin.id}</h4>
-      <h4 className="muted">{time.toLocaleTimeString()} {time.toLocaleDateString()}</h4>
+      {/*<h4 className="muted">{props.pin.id}</h4>*/}
+      {/*<h4 className="muted">{time.toLocaleTimeString()} {time.toLocaleDateString()}</h4>*/}
       {/*<h4 className="muted">lat: {props.lat}</h4>
       <h4 className="muted">lng: {props.lng}</h4>*/}
     </div>

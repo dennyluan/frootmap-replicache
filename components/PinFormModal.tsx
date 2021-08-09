@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import Modal from "react-modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { useDispatch } from "react-redux";
 import { useSwipeable } from "react-swipeable";
 
 import { ICoords } from "../models/types";
@@ -28,8 +27,6 @@ const PinFormModal = (props: IPinModalProps) => {
   const [fruit, setFruit] = useState<string>("");
   const [titleInput, setTitleInput] = useState<string>("");
   const [error, setError] = useState<string>("");
-
-  const dispatch = useDispatch()
 
   const handlers = useSwipeable({
     onSwiped: (eventData) => {
@@ -249,10 +246,3 @@ const PinFormModal = (props: IPinModalProps) => {
 };
 
 export default PinFormModal
-
-// const mapDispatch = { createPin }
-
-// export default connect(
-//   null,
-//   mapDispatch)
-// (PinFormModal)

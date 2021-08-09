@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import GoogleMapReact from "google-map-react";
 import { ICoords, IPin, IPoint } from "../models/types";
 import { PointFeature, ClusterProperties, AnyProps, ClusterFeature } from 'supercluster';
@@ -57,8 +57,6 @@ const Map = (props: MapProps) => {
     props.rep,
     async tx => {
       const data : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
-
-      console.log("[map.tsx] pins subscription data", data)
       const pins = deserialize(data)
       return pins
     },
@@ -95,8 +93,11 @@ const Map = (props: MapProps) => {
     event: React.MouseEvent<HTMLButtonElement>;
   }): any => {
     event.preventDefault();
-    // console.log('clicked map')
+
+    console.log('>>> MAP props', props)
     if (!props.isShown)
+      // if (props.pin == {}) {
+      // }
       props.togglePinFormModal({lat: lat, lng: lng})
 
       props.setSelectedViewCoords({lat: lat, lng: lng})
@@ -178,7 +179,7 @@ const Map = (props: MapProps) => {
     })
   }
 
-  console.log(">> some pins", pins)
+  // console.log(">> some pins", pins)
 
   return (
     <div style={{ height: '100vh', width: '100%' }}>

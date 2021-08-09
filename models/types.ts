@@ -53,6 +53,39 @@ export interface IFruit {
   text: string
 }
 
+
+export interface ISession {
+  provider_token?: string | null,
+  access_token: string,
+  expires_at?: number,
+  expires_in?: number,
+  refresh_token?: string,
+  token_type: string,
+  user: SupabaseUser | null,
+}
+
+interface SupabaseUser {
+  app_metadata: {
+    provider?: string,
+    [key: string] : any
+  },
+  aud: string,
+  confirmation_sent_at?: string,
+  confirmed_at?: string,
+  created_at: string,
+  email?: string,
+  email_confirmed_at?: string,
+  id: string,
+  last_sign_in_at?: string,
+  phone?: string,
+  recovery_sent_at?: string,
+  role?: string,
+  updated_at?: string,
+  user_metadata: {
+    [key: string] : any
+  }
+}
+
 /** The values that can be represented in JSON */
 export type JSONValue =
   | null

@@ -47,13 +47,17 @@ export default async (req, res) => {
 
         switch (mutation.name) {
           case 'createPin':
-            await createPin(t, mutation.args, version);
-            break;
+            await createPin(t, mutation.args, version)
+            break
           case 'deletePin':
-            await deletePin(t, mutation.args, version);
-            break;
+            await deletePin(t, mutation.args, version)
+            break
+
+          case 'updatePin':
+            await updatePin(t, mutation.args)
+            break
           default:
-            throw new Error(`Unknown mutation: ${mutation.name}`);
+            throw new Error(`Unknown mutation: ${mutation.name}`)
         }
 
         lastMutationID = expectedMutationID;
@@ -109,6 +113,19 @@ async function deletePin(db, {id}, version) {
   console.log("[deleting] data", data)
   console.log("!!!####\n\n [deleting] in try error", error)
 
+}
+
+async function updatePin(db, args) {
+  console.log(">>>>> updating pin", args)
+
+  let pinId = id.replace("pin/", "")
+  const time = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('pin')
+    .upsert(args)
+    .match({ id: pinId })
+
+  console.log("[updating pin]", data)
 }
 
 async function clearPins() {
