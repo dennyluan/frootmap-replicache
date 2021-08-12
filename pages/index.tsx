@@ -37,7 +37,7 @@ function App(props: any) {
   const [ vespaCoords, setVespaCoords ] = useState<ICoords>();
   const [ selectedViewCoords, setSelectedViewCoords ] = useState<ICoords>({ lat: 0, lng: 0 });
   const { isShown, togglePinFormModal, modalPinCoords } = useFormModal();
-  const { activePin, togglePinModal } = usePinModal(null);
+  const { activePin, togglePinModal } = usePinModal();
   const { map } = useSelector( ( state: { map: any } ) => state.map );
   const mapRef = useRef<any>(null);
   const [bounds, setBounds] = useState<any>(null)
@@ -63,7 +63,7 @@ function App(props: any) {
     // getClientID(rep)
   }, [])
 
-  async function getClientID(rep){
+  async function getClientID(rep: Replicache<MutatorDefs>){
     console.log("hi")
     if (rep != undefined) {
       const id = await rep.clientID

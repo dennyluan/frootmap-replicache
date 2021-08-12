@@ -24,7 +24,7 @@ export const useFormModal = () => {
 };
 
 export const usePinModal = () => {
-  const [activePin, setIsShown] = useState<IPin | {}>();
+  const [activePin, setIsShown] = useState<IPin | {}>({})
 
   const togglePinModal = ( pin?: IPin ) => {
     if (pin) {

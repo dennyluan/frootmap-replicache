@@ -117,14 +117,13 @@ const PinFormModal = (props: IPinModalProps) => {
     // alt strategy: try 2! sequence columns
       // version and lock_version
 
+    let value
     const { data, error } = await supabase
       .from('version')
       .select('last_value')
-      // .then(resp => {
-      //   console.log("resp", resp.body[0].last_value)
-      //   return resp.body[0].last_value
-      // })
-    let value = data[0].last_value
+    if (data && data.length != 0) {
+      value = data[0].last_value
+    }
     return value
   }
 

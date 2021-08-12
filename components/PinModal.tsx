@@ -22,7 +22,7 @@ const PinModal = ( props: ModalProps ) => {
   let open = (pin && pin.id != undefined) || false
 
   const [isEditingPin, toggleEdit] = useState(true)
-  const [editingPinData, setEditPinData] = useState<IPin>({text: '', description: ''})
+  const [editingPinData, setEditPinData] = useState<IPin | {text: string, description: string}>({text: '', description: ''})
 
   useEffect( () => {
     props.togglePinFormModal({}, false);
@@ -43,7 +43,7 @@ const PinModal = ( props: ModalProps ) => {
   function handleClose() {
     toggleEdit(false)
     props.togglePinFormModal({}, false);
-    props.togglePinModal(null);
+    props.togglePinModal();
     props.setSelectedViewCoords({lat: 0, lng: 0})
   }
 
@@ -52,12 +52,16 @@ const PinModal = ( props: ModalProps ) => {
     handleClose()
   }
 
-  // console.log("props.pin", props.pin)
-  // console.log("editingPinData", editingPinData)
+  interface EventProps {
+    // React.FormEvent<HTMLInputElement>
+    //       FormEvent<HTMLFormElement>
+    // React.MouseEvent<HTMLButtonElement>
+    e: any
+  }
 
-  function handleUpdate(e) {
-    e.preventDefault()
-    console.log("saving")
+  // function handleUpdate(e: EventProps) {
+  function handleUpdate() {
+    console.log("{existing} pin", pin)
 
     let id = Math.random().toString(32).substr(2)
 
@@ -66,30 +70,12 @@ const PinModal = ( props: ModalProps ) => {
 
     // const time = new Date().toISOString()
 
-    console.log("{existing} pin", pin)
-
     // increment the version by one
     const version = parseInt(pin.version) + 1
-
-    // const newpayload = {
-    //   id: id,
-    //   sender: "Denny",
-    //   description: "A fruit",
-    //   text: value,
-    //   lat: lat,
-    //   lng: lng,
-    //   version: version,
-    //   created_at: time,
-    //   updated_at: time
-    // }
-
-
-    // const newPin = {...pin, version: version}
 
     // TODO: serialize pin function
     // todo: make a type for the supabase column type e.g. ISPin
     const time = new Date().toISOString()
-
     const newPin = {
       // ...pin,
       id: pin.id,
@@ -101,14 +87,9 @@ const PinModal = ( props: ModalProps ) => {
       updated_at: time,
       version: version,
     }
-
-    console.log("newPin", newPin)
-
     props.rep.mutate.updatePin(newPin);
 
     handleClose();
-
-    // hook into mutate call here with editingPinData
   }
 
   return <Modal
@@ -158,12 +139,22 @@ const PinModal = ( props: ModalProps ) => {
             <div className="form border p-3 mt-4 rounded-3">
               <h4>Edit this pin</h4>
 
-              <form className="form form-inline" onSubmit={(e) => handleUpdate(e)}>
+              <form
+                className="form form-inline"
+                onSubmit={
+                  // (e: React.FormEvent<HTMLInputElement>)  => handleUpdate(e)
+                  // (e: React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLInputElement>) => {
+                  (e: any) => {
+                    e.preventDefault()
+                    handleUpdate()
+                  }
+                }
+              >
 
                 <div className="form-group col-5">
                   <label>Text</label>
                   <input name="text"
-                    type="text"
+                    // type="text"
                     className='form-control'
                     value={editingPinData.text}
                     onChange={ (e) => setEditPinData({...editingPinData, "text": e.target.value}) }
@@ -174,6 +165,7 @@ const PinModal = ( props: ModalProps ) => {
                 <div className="form-group col-5">
                   <label>Description</label>
                   <textarea name="description"
+                    // type="text"
                     className='form-control'
                     onChange={ (e) => setEditPinData({...editingPinData, "description": e.target.value}) }
                     value={editingPinData.description}
@@ -212,3 +204,8 @@ const PinModal = ( props: ModalProps ) => {
 }
 
 export default PinModal
+
+
+interface SyntheticEvent<T> {
+    currentTarget: EventTarget & T;
+}

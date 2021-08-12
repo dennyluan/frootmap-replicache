@@ -48,6 +48,7 @@ interface MapProps {
   // allPoints: IPoint[] | [],
   rep: Replicache<MutatorDefs>
   vespaCoords?: ICoords,
+  pin: (IPin | {}),
 }
 
 const Map = (props: MapProps) => {

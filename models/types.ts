@@ -14,7 +14,7 @@ export interface IPin {
   updated_at: string,
   description: string,
   version: number,
-  coords: ICoords
+  coords: ICoords | number[] // eek
 }
 
 // all data points
