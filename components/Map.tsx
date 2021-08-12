@@ -94,7 +94,7 @@ const Map = (props: MapProps) => {
   }): any => {
     event.preventDefault();
 
-    console.log('>>> MAP props', props)
+    // console.log('>>> MAP props', props)
     if (!props.isShown)
       // if (props.pin == {}) {
       // }
@@ -179,7 +179,7 @@ const Map = (props: MapProps) => {
     })
   }
 
-  // console.log(">> some pins", pins)
+  console.log(">> some pins", pins)
 
   return (
     <div style={{ height: '100vh', width: '100%' }}>

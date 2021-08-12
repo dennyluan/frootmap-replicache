@@ -11,6 +11,7 @@ export function deserialize(data: any) {
       "created_at": pin[1].created_at,
       "updated_at": pin[1].updated_at,
       "description": pin[1].description,
+      "version": pin[1].version,
       "text": pin[1].text,
     },
     "geometry": {
@@ -30,10 +31,21 @@ export function deserializeFromCluster(cluster: ClusterFeature<any>) {
     created_at: cluster.properties.created_at,
     updated_at: cluster.properties.updated_at,
     description: cluster.properties.description,
-    coords: {
-      lat: cluster.properties[0],
-      lng: cluster.properties[1]
-    }
+    version: cluster.properties.version,
+    coords: [
+      // lat: cluster.properties[0],
+      // lng: cluster.properties[1]
+      // lat: parseFloat(cluster.geometry.coordinates[0]),
+      // lng: parseFloat(cluster.geometry.coordinates[1])
+      cluster.geometry.coordinates[0],
+      cluster.geometry.coordinates[1]
+    ]
   }
+  // console.log("deserializeFromCluster:", cluster)
+  // console.log("deserializeFromCluster:", pin.text, "pin:", pin)
   return pin
+}
+
+export function serialize() {
+
 }

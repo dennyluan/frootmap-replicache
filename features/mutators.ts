@@ -12,16 +12,17 @@ export const mutators = {
     lng: number,
     created_at: string,
     updated_at: string,
+    version: number,
   } ) {
-    console.log("[createPin] args:", args)
+    // console.log("[createPin] args:", args)
     await tx.put(`pin/${args['id']}`, args);
   },
 
   async deletePin(tx: WriteTransaction, args: {
     id: string,
   }) {
-    console.log('[deletePin] pin id:', args['id'])
-    const del = await tx.del(`pin/${args['id']}`)
+    // console.log('[deletePin] pin id:', args['id'])
+    await tx.del(`pin/${args['id']}`)
   },
 
   async updatePin(tx: WriteTransaction, args: {
@@ -32,12 +33,21 @@ export const mutators = {
     ord: number,
     lat: number,
     lng: number,
+    version: number,
     created_at: string,
     updated_at: string,
   }) {
-    console.log("[updatePin] args:", args)
+    // console.log("[updatePin] args:", args)
     await tx.put(`pin/${args['id']}`, args);
   },
+
+  async clearPins(tx: WriteTransaction) {
+    await Promise.all(
+      (await tx.scan({ prefix: `pin` }).keys().toArray()).map((k) =>
+        tx.del(k)
+      )
+    );
+  }
 
   // async ...
 }

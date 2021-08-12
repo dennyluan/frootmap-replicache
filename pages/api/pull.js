@@ -18,15 +18,22 @@ export default async (req, res) => {
         )?.last_mutation_id ?? '0',
       );
 
+
+      // get all the later or newer changes after version
       const changed = await db.manyOrNone(
-        'select id, sender, text, description, lat, lng, ord, created_at, updated_at from pin where version > $1',
+        `
+          select id, sender, text, description, lat, lng, created_at, updated_at, version
+            from pin
+            where version > $1
+        `,
         parseInt(pull.cookie ?? 0),
       );
 
-
+      // now get the latest transaction from the db
       const cookie = (
         await db.one('select max(version) as version from pin')
       ).version;
+
 
       // console.log("\n[pull]", {cookie, lastMutationID, changed});
 
@@ -48,12 +55,13 @@ export default async (req, res) => {
           text: row.text,
           lat: row.lat,
           lng: row.lng,
+          version: row.version,
           created_at: row.created_at,
           updated_at: row.updated_at,
           description: row.description,
-          order: parseInt(row.ord),
           id: row.id,
         },
+          // order: parseInt(row.ord),
       })));
 
 
@@ -72,6 +80,8 @@ export default async (req, res) => {
           key: `pin/${pin.id}`,
         })
       })
+
+      console.log("[pull] cookie", cookie)
 
       res.json({
         lastMutationID,

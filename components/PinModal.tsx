@@ -59,33 +59,54 @@ const PinModal = ( props: ModalProps ) => {
     e.preventDefault()
     console.log("saving")
 
-
-    let order;
-
-    const last = pins.length && pins[pins.length - 1][1];
-    order = (last?.order ?? 0) + 1;
-
     let id = Math.random().toString(32).substr(2)
 
-    let {lat, lng} = props.modalPinCoords
-    let value = fruit || titleInput || null
+    // let {lat, lng} = props.modalPinCoords
+    // let value = fruit || titleInput || null
 
+    // const time = new Date().toISOString()
+
+    console.log("{existing} pin", pin)
+
+    // increment the version by one
+    const version = parseInt(pin.version) + 1
+
+    // const newpayload = {
+    //   id: id,
+    //   sender: "Denny",
+    //   description: "A fruit",
+    //   text: value,
+    //   lat: lat,
+    //   lng: lng,
+    //   version: version,
+    //   created_at: time,
+    //   updated_at: time
+    // }
+
+
+    // const newPin = {...pin, version: version}
+
+    // TODO: serialize pin function
+    // todo: make a type for the supabase column type e.g. ISPin
     const time = new Date().toISOString()
 
-    const newpayload = {
-      id: id,
-      sender: "Denny",
-      description: "A fruit",
-      ord: order,
-      text: value,
-      lat: lat,
-      lng: lng,
-      created_at: time,
-      updated_at: time
+    const newPin = {
+      // ...pin,
+      id: pin.id,
+      text: editingPinData.text,
+      description: editingPinData.description,
+      lat: parseFloat(pin.coords[1]),
+      lng: parseFloat(pin.coords[0]),
+      created_at: pin.created_at,
+      updated_at: time,
+      version: version,
     }
 
-    props.rep.mutate.updatePin(newpayload);
+    console.log("newPin", newPin)
 
+    props.rep.mutate.updatePin(newPin);
+
+    handleClose();
 
     // hook into mutate call here with editingPinData
   }
@@ -117,6 +138,7 @@ const PinModal = ( props: ModalProps ) => {
             <div>
               <p>About this pin:</p>
               <p>{pin && pin.description}</p>
+              <p>{pin && JSON.stringify(pin.version)}</p>
 
               <button
                 className="mt-l me-1 btn btn-secondary btn-sm"

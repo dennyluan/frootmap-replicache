@@ -8,13 +8,13 @@ export default async (_, res) => {
     await t.none('DROP TABLE IF EXISTS pin');
     await t.none('DROP TABLE IF EXISTS replicache_client');
     await t.none('DROP SEQUENCE IF EXISTS version');
+    await t.none('DROP SEQUENCE IF EXISTS lock_version');
 
     // Stores chat messages
     await t.none(`CREATE TABLE pin (
       id VARCHAR(20) PRIMARY KEY NOT NULL,
       text TEXT null,
       description TEXT null,
-      ord BIGINT null,
       sender VARCHAR(255) null,
       lat NUMERIC null,
       lng NUMERIC null,
@@ -28,6 +28,7 @@ export default async (_, res) => {
       last_mutation_id BIGINT NOT NULL)`);
     // Will be used for computing diffs for pull response
     await t.none('CREATE SEQUENCE version');
+    await t.none('CREATE SEQUENCE lock_version');
   });
   res.send('ok');
 };

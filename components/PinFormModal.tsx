@@ -12,6 +12,9 @@ import { setMap } from "../features/mapSlice";
 import { useSubscribe } from 'replicache-react';
 import { Replicache, MutatorDefs } from 'replicache';
 
+import {supabase} from '../utils/supabase.js';
+
+
 Modal.setAppElement("#root");
 
 interface IPinModalProps {
@@ -63,7 +66,10 @@ const PinFormModal = (props: IPinModalProps) => {
   // }, [isShown]);
 
   const handleClearPins = () : void => {
-    props.clearPins()
+    props.rep.mutate.clearPins();
+    handleClose()
+
+    // props.clearPins()
   }
 
   function renderFruits() {
@@ -87,6 +93,7 @@ const PinFormModal = (props: IPinModalProps) => {
     props.rep,
     async tx => {
       const thepins : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
+      console.log("thepins", thepins)
       return thepins;
     },
     [],
@@ -100,13 +107,34 @@ const PinFormModal = (props: IPinModalProps) => {
     props.setSelectedViewCoords({lat: 0, lng: 0})
   }
 
+  // this function gets the global atomic timestamp
+  async function getVersion() {
+
+    // 1. get the "select currval('vesion')"
+    // 2. set a lock
+    // later. release the lock when the push is registered?
+
+    // alt strategy: try 2! sequence columns
+      // version and lock_version
+
+    const { data, error } = await supabase
+      .from('version')
+      .select('last_value')
+      // .then(resp => {
+      //   console.log("resp", resp.body[0].last_value)
+      //   return resp.body[0].last_value
+      // })
+    let value = data[0].last_value
+    return value
+  }
+
   // todo: form payload
   function repCreatePin(payload: any) {
 
     let order;
 
     const last = pins.length && pins[pins.length - 1][1];
-    order = (last?.order ?? 0) + 1;
+    // order = (last?.order ?? 0) + 1;
 
     let id = Math.random().toString(32).substr(2)
 
@@ -115,19 +143,22 @@ const PinFormModal = (props: IPinModalProps) => {
 
     const time = new Date().toISOString()
 
+    const version = getVersion()
+    console.log('()()(version', version)
+
     const newpayload = {
       id: id,
       sender: "Denny",
       description: "A fruit",
-      ord: order,
       text: value,
       lat: lat,
       lng: lng,
       created_at: time,
-      updated_at: time
+      updated_at: time,
+      version: version
     }
 
-    console.log("[pinformmodal] payload", newpayload)
+    // console.log("[pinformmodal] payload", newpayload)
 
     props.rep.mutate.createPin({...newpayload});
   }
@@ -230,9 +261,15 @@ const PinFormModal = (props: IPinModalProps) => {
               >
                 Save changes
               </button>
+
+              <button onClick={()=>getVersion()}>get version</button>
+
             </div>
           </div>
         </div>
+
+
+
 
         <p className="muted mt-5 position-absolute text-center w-100">
           Coordinates:

@@ -8,9 +8,10 @@ import { supabase } from '../../utils/supabase';
 // description        text
 // version            int8
 // sender             varchar
-// ord                int8
 // lat                float8
 // lng                float8
+
+// This strategy has to act as a kind of lock, using nextval(version)
 
 export default async (req, res) => {
 
@@ -20,15 +21,19 @@ export default async (req, res) => {
   const t0 = Date.now();
   try {
     await db.tx(async t => {
+      // gets next global atomic time stamp from database
       const {nextval: version} = await db.one("SELECT nextval('version')");
-      console.log("version", version)
 
+      // return the clients latest mutation integer
       let lastMutationID = await getLastMutationID(t, push.clientID);
 
-      console.log('[push] version', version, 'lastMutationID:', lastMutationID);
+      console.log('[push] global version:', version, ', lastMutationID:', lastMutationID)
 
       for (const mutation of push.mutations) {
         const t1 = Date.now();
+
+        console.log("::mutation", mutation)
+
 
         const expectedMutationID = lastMutationID + 1;
 
@@ -50,11 +55,13 @@ export default async (req, res) => {
             await createPin(t, mutation.args, version)
             break
           case 'deletePin':
-            await deletePin(t, mutation.args, version)
+            await deletePin(t, mutation.args)
             break
-
           case 'updatePin':
-            await updatePin(t, mutation.args)
+            await updatePin(t, mutation.args, version, mutation.id)
+            break
+          case 'clearPins':
+            await clearPins(t, mutation.args)
             break
           default:
             throw new Error(`Unknown mutation: ${mutation.name}`)
@@ -88,19 +95,19 @@ export default async (req, res) => {
 
 }
 
-async function createPin(db, {id, sender, text, description, ord, lat, lng, created_at, updated_at}, version) {
+async function createPin(db, {id, sender, text, description, lat, lng, created_at, updated_at}, version) {
   try {
-    console.log("[push] createpin payload:", { id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
+    console.log("[push] createpin payload:", { id, sender, text, description, lat, lng, version, created_at, updated_at })
     const { data, error } = await supabase
       .from('pin')
-      .insert({ id, sender, text, description, lat, lng, ord, version, created_at, updated_at })
+      .insert({ id, sender, text, description, lat, lng, version, created_at, updated_at })
 
   } catch (error) {
     console.log("!!!#### push error", error)
   }
 }
 
-async function deletePin(db, {id}, version) {
+async function deletePin(db, {id}) {
   let pinId = id.replace("pin/", "")
   const time = new Date().toISOString()
   const { data, error } = await supabase
@@ -112,31 +119,52 @@ async function deletePin(db, {id}, version) {
     // })
   console.log("[deleting] data", data)
   console.log("!!!####\n\n [deleting] in try error", error)
-
 }
 
-async function updatePin(db, args) {
-  console.log(">>>>> updating pin", args)
+async function updatePin(db, args, version, id) {
+  console.log(">>>>> updating pin", args, "version: ", version, "id: ", id)
 
-  let pinId = id.replace("pin/", "")
+  let pinId = args.id.replace("pin/", "")
+
+  // const time = new Date().toISOString()
+  let newArgs = {
+    ...args,
+    version: id + 1,
+  }
+
+
+  try {
+    const { data, error } = await supabase
+      .from('pin')
+      .upsert(newArgs)
+      .match({ id: pinId })
+      // .then((resp)=>{
+        // console.log("[updating pin data]", resp)
+      // })
+    console.log("[updating pin data]", data)
+
+  } catch (error) {
+    console.log("[updating pin error]", error)
+  }
+}
+
+async function clearPins(db, args) {
+  // const ids = args.ids
   const time = new Date().toISOString()
-  const { data, error } = await supabase
+  const {data, error } = await supabase
     .from('pin')
-    .upsert(args)
-    .match({ id: pinId })
+    .update({ deleted_at: time })
+    .is("deleted_at", null)
 
-  console.log("[updating pin]", data)
-}
 
-async function clearPins() {
 }
 
 async function getLastMutationID(t, clientID) {
   const clientRow = await t.oneOrNone(
     'SELECT last_mutation_id FROM replicache_client WHERE id = $1', clientID,
   );
+
   if (clientRow) {
-    console.log("[push] Found client:", parseInt(clientRow.last_mutation_id))
     return parseInt(clientRow.last_mutation_id);
   }
 

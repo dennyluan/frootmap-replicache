@@ -13,6 +13,7 @@ export interface IPin {
   created_at: string,
   updated_at: string,
   description: string,
+  version: number,
   coords: ICoords
 }
 

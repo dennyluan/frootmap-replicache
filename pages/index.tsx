@@ -22,6 +22,8 @@ import Account from '../components/Account'
 // const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
 function App(props: any) {
+  const debug = true
+
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
   const [session, setSession] = useState<ISession | null>(null)
@@ -42,8 +44,6 @@ function App(props: any) {
   const [zoom, setZoom] = useState<number>(16);
   const [rep, setRep] = useState<Replicache<MutatorDefs>>();
 
-
-
   useEffect(()=> {
     setupGeo(setVespaCoords)
 
@@ -59,7 +59,17 @@ function App(props: any) {
 
     listen(rep);
     setRep(rep);
+
+    // getClientID(rep)
   }, [])
+
+  async function getClientID(rep){
+    console.log("hi")
+    if (rep != undefined) {
+      const id = await rep.clientID
+      console.log("id:", id)
+    }
+  }
 
   return (
     <div className="App">
@@ -67,7 +77,7 @@ function App(props: any) {
       {rep &&
 
         <div className="body">
-            <Navigation rep={rep}>
+            <Navigation rep={rep} debug={debug}>
             </Navigation>
 
             <Map
