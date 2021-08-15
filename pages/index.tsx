@@ -22,7 +22,7 @@ import Account from '../components/Account'
 // const RepContainerDynamic = dynamic(() => import('../components/RepContainer'))
 
 function App(props: any) {
-  const debug = true
+  const debug = (process.env.NODE_ENV !== 'production')
 
   const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
