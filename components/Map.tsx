@@ -183,7 +183,10 @@ const Map = (props: MapProps) => {
   console.log(">> some pins", pins)
 
   return (
-    <div style={{ height: '100vh', width: '100%' }}>
+    <div
+      style={{ height: '100vh', width: '100%' }}
+      className="map"
+    >
 
       {/*
         <pre style={{

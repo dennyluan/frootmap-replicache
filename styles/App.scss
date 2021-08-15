@@ -134,5 +134,8 @@ img[src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5.png"] {
 .vespa {
   z-index: 2000;
   position: absolute
+}
 
+.map {
+  overscroll-behavior: contain;
 }
