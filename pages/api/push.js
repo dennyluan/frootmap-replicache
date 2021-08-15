@@ -61,7 +61,7 @@ export default async (req, res) => {
             await updatePin(t, mutation.args, version, mutation.id)
             break
           case 'clearPins':
-            await clearPins(t, mutation.args)
+            await clearPins(t)
             break
           default:
             throw new Error(`Unknown mutation: ${mutation.name}`)
@@ -101,7 +101,6 @@ async function createPin(db, {id, sender, text, description, lat, lng, created_a
     const { data, error } = await supabase
       .from('pin')
       .insert({ id, sender, text, description, lat, lng, version, created_at, updated_at })
-
   } catch (error) {
     console.log("!!!#### push error", error)
   }
@@ -114,11 +113,6 @@ async function deletePin(db, {id}) {
     .from('pin')
     .upsert({ id: pinId, deleted_at: time })
     .match({ id: pinId })
-    // .then(resp => {
-    //   console.log("RESP", resp)
-    // })
-  console.log("[deleting] data", data)
-  console.log("!!!####\n\n [deleting] in try error", error)
 }
 
 async function updatePin(db, args, version, id) {
@@ -126,37 +120,28 @@ async function updatePin(db, args, version, id) {
 
   let pinId = args.id.replace("pin/", "")
 
-  // const time = new Date().toISOString()
   let newArgs = {
     ...args,
     version: id + 1,
   }
-
 
   try {
     const { data, error } = await supabase
       .from('pin')
       .upsert(newArgs)
       .match({ id: pinId })
-      // .then((resp)=>{
-        // console.log("[updating pin data]", resp)
-      // })
     console.log("[updating pin data]", data)
-
   } catch (error) {
     console.log("[updating pin error]", error)
   }
 }
 
-async function clearPins(db, args) {
-  // const ids = args.ids
+async function clearPins(db) {
   const time = new Date().toISOString()
   const {data, error } = await supabase
     .from('pin')
     .update({ deleted_at: time })
     .is("deleted_at", null)
-
-
 }
 
 async function getLastMutationID(t, clientID) {

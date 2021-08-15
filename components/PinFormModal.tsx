@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import Modal from "react-modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { faTimesCircle, faCameraRetro } from "@fortawesome/free-solid-svg-icons";
 import { useSwipeable } from "react-swipeable";
 
 import { ICoords } from "../models/types";
@@ -14,6 +14,7 @@ import { Replicache, MutatorDefs } from 'replicache';
 
 import {supabase} from '../utils/supabase.js';
 
+import PinImage from './PinImage'
 
 Modal.setAppElement("#root");
 
@@ -30,6 +31,8 @@ const PinFormModal = (props: IPinModalProps) => {
   const [fruit, setFruit] = useState<string>("");
   const [titleInput, setTitleInput] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const [image, setImage] = useState<string | null>(null);
 
   const handlers = useSwipeable({
     onSwiped: (eventData) => {
@@ -195,8 +198,8 @@ const PinFormModal = (props: IPinModalProps) => {
       >
         <div {...handlers} className="modal-dialog">
           <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Choose a fruit:</h5>
+            <div className="modal-header border-none">
+              <h5 className="modal-title">Add a new pin</h5>
               <FontAwesomeIcon
                 icon={faTimesCircle}
                 onClick={() => handleClose()}
@@ -226,19 +229,21 @@ const PinFormModal = (props: IPinModalProps) => {
 
               {renderFruits()}
 
+              <h5 className="modal-title mt-4">
+                Attach a photo
+              </h5>
+
+              <PinImage
+                onUpload={ (filePath: string) => {
+                  setImage(filePath)
+                }}
+                size={160}
+                url={image}
+              />
+
             </div>
 
             <div className="modal-footer">
-
-              {/*
-              <button
-                className="btn btn-danger ml-3"
-                onClick={()=>dispatch(setMap({lat: 47.608013, lng: -122.335167, map: mapRef}))}
-              >
-                Go to Seattle
-              </button>
-              */}
-
               <button
                 className="btn btn-danger ml-3"
                 onClick={handleClearPins}
@@ -261,14 +266,11 @@ const PinFormModal = (props: IPinModalProps) => {
                 Save changes
               </button>
 
-              <button onClick={()=>getVersion()}>get version</button>
+              {/*<button onClick={()=>getVersion()}>get version</button>*/}
 
             </div>
           </div>
         </div>
-
-
-
 
         <p className="muted mt-5 position-absolute text-center w-100">
           Coordinates:

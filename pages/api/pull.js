@@ -1,6 +1,9 @@
 import {db} from '../../db.js';
 import {supabase} from '../../utils/supabase.js';
 
+
+// op:put, op:del, op:clear
+
 export default async (req, res) => {
   console.log("\n\n\n")
   const pull = req.body;
