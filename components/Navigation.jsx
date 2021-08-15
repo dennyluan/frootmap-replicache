@@ -23,10 +23,12 @@ export default function Navigation(props) {
         {/*{props.children}*/}
 
         {props.debug &&
-          <Version rep={props.rep}/>
+          <Version  rep={props.rep}/>
         }
 
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Toggle
+        aria-controls="basic-navbar-nav"
+      />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
 
@@ -145,6 +147,7 @@ const Version = (props) => {
 
   return (
     <ul className="breadcrumb text-start">
+
       <p className="breadcrumb-item muted">Debug</p>
       <li className="breadcrumb-item">ID: {clientID}</li>
       <li className="breadcrumb-item">Global Version: {version}</li>

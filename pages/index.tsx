@@ -80,14 +80,9 @@ function App(props: any) {
             <Navigation
               rep={rep}
               debug={debug}
-              navigateTo={()=>
-                mapRef.current.panTo(
-                  {
-                    lat: (vespaCoords.lat),
-                    lng: (vespaCoords.lng)
-                  }
-                )
-              }
+              navigateTo={()=> {
+                if (vespaCoords) mapRef.current.panTo(vespaCoords)
+              }}
             >
             </Navigation>
 
