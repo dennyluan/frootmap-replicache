@@ -77,7 +77,18 @@ function App(props: any) {
       {rep &&
 
         <div className="body">
-            <Navigation rep={rep} debug={debug}>
+            <Navigation
+              rep={rep}
+              debug={debug}
+              navigateTo={()=>
+                mapRef.current.panTo(
+                  {
+                    lat: (vespaCoords.lat),
+                    lng: (vespaCoords.lng)
+                  }
+                )
+              }
+            >
             </Navigation>
 
             <Map

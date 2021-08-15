@@ -14,7 +14,12 @@ export default function Navigation(props) {
 
   return (
     <Navbar bg="light" expand="lg">
-      <Navbar.Brand href="#home">Fruit Camera</Navbar.Brand>
+      <Navbar.Brand
+        href="#home"
+        onClick={props.navigateTo}
+      >
+        Fruit Camera
+      </Navbar.Brand>
         {/*{props.children}*/}
 
         {props.debug &&
