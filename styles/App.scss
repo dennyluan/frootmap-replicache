@@ -4,9 +4,16 @@
 
 @import 'animate.css';
 
+html {
+  width: 100%;
+  position: fixed;
+  overflow: hidden;
+}
 
 .App {
   text-align: center;
+  position: fixed;
+  // -webkit-overflow-scrolling: touch;
 }
 
 .App-logo {
